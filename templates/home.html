@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+    <h1>fishare</h1>
+    <form enctype="multipart/form-data" action="/files/" method="post">
+        <div class="input-group">
+            <input class="form-control form-control-lg" name="payload" type="file">
+            <button class="btn btn-lg btn-primary" type="submit">Upload</button>
+        </div>
+    </form>
+
+{% endblock %}
