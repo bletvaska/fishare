@@ -27,7 +27,11 @@ def get_file(slug: str):
         with Session(engine) as session:
             statement = select(File).where(File.slug == slug)
             file = session.exec(statement).one()
-            return file
+
+            data = file.dict()
+            data['link'] = file.url()
+
+            return data
 
     except NoResultFound as ex:
         content = {
