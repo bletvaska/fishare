@@ -16,7 +16,12 @@ pytest = "^6.2"
 ipython = "^7.30.0"
 httpie = "^2.6.0"
 litecli = "^1.6.0"
+Faker = "^9.9.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+create_tables = "helpers:create_tables"
+populate_data = "helpers:populate_data"
