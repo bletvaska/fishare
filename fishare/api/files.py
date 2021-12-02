@@ -1,4 +1,5 @@
 import fastapi
+from models.file import File
 
 router = fastapi.APIRouter()
 
@@ -15,17 +16,13 @@ def list_of_files():
 # select * from files where filename={filename}
 @router.get('/files/{filename}')
 def get_file(filename: str):
-    return {
-        'id': 1234,
-        'slug': 'abcde',
-        'filename': 'filename',
-        'link': 'http://fishare.io/slug',
-        'downloads': 0,
-        'maxDownloads': 1,
-        'size': 10000,
-        'mimeType': 'text/plain',
-        'created': '2021-12-02 08:16:12'
-    }
+    file = File(
+        filename='batman.movie.avi',
+        size=1234567,
+        mime_type='video/mp4'
+    )
+
+    return file.dict()
 
 
 @router.delete('/files/{filename}')  # delete from files where filename={filename}
