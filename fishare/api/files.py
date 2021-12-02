@@ -13,11 +13,9 @@ router = fastapi.APIRouter()
 
 @router.get('/files/')  # select * from files
 def list_of_files():
-    return [
-        'file1',
-        'file2',
-        'file3'
-    ]
+    with Session(engine) as session:
+        statement = select(File)
+        return session.exec(statement).all()
 
 
 # select * from files where filename={filename}
