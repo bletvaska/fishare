@@ -22,7 +22,7 @@ def populate_data():
     categories = ('audio', 'video', 'image', 'text')
 
     with Session(engine) as session:
-        for _ in range(10):
+        for _ in range(1000):
             category = choice(categories)
 
             file = File(
@@ -33,7 +33,7 @@ def populate_data():
                 created = datetime.now()
             )
 
-            print(repr(file))
+            # print(repr(file))
 
             session.add(file)
             session.commit()
