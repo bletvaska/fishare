@@ -12,7 +12,7 @@ app.include_router(homepage.router)
 
 
 def main():
-    uvicorn.run('main:app', port=8080, host='0.0.0.0', reload=True)
+    uvicorn.run('fishare.main:app', port=8080, host='127.0.0.1', reload=True)
 
 
 if __name__ == '__main__':

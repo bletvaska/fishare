@@ -1,15 +1,13 @@
-import fastapi
 from starlette.responses import JSONResponse
 from sqlmodel import Session, select
 from sqlalchemy.exc import NoResultFound
+from fastapi import Request, APIRouter
 
-from models.file import File
-from models.settings import Settings
-from database import engine
+from fishare.models.file import File
+from fishare.models.settings import Settings
+from fishare.database import engine
 
-from fastapi import Request
-
-router = fastapi.APIRouter()
+router = APIRouter()
 
 
 @router.get('/files/')  # select * from files
@@ -60,8 +58,8 @@ def get_file(slug: str):
         # return data
 
 
-@router.delete('/files/{filename}')  # delete from files where filename={filename}
-def delete_file(filename: str):
+@router.delete('/files/{slug}')  # delete from files where filename={filename}
+def delete_file(slug: str):
     return "deleted"
 
 

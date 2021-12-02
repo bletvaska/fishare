@@ -23,6 +23,6 @@ requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.scripts]
-create_tables = "helpers:create_tables"
-populate_data = "helpers:populate_data"
-app = "main:main"
+create_tables = "fishare.helpers:create_tables"
+populate_data = "fishare.helpers:populate_data"
+app = "fishare.main:main"

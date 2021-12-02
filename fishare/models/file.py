@@ -4,7 +4,7 @@ from typing import Optional
 
 from sqlmodel import SQLModel, Field
 
-from models.settings import Settings
+from fishare.models.settings import Settings
 
 settings = Settings()
 

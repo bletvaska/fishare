@@ -1,6 +1,6 @@
 from sqlmodel import create_engine
 
-from models.settings import Settings
+from fishare.models.settings import Settings
 
 settings = Settings()
 

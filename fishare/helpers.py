@@ -5,18 +5,24 @@ from time import sleep
 import secrets
 from datetime import datetime
 
-from models.file import File
-from models.settings import Settings
-from database import engine
+from fishare.models.file import File
+from fishare.models.settings import Settings
+from fishare.database import engine
 
 settings = Settings()
 
 
 def create_tables():
+    """
+    Creates empty tables based on loaded modules
+    """
     SQLModel.metadata.create_all(engine)
 
 
 def populate_data():
+    """
+    Populates data for testing purposes
+    """
     faker = Faker()
 
     categories = ('audio', 'video', 'image', 'text')
