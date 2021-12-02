@@ -12,10 +12,19 @@ def list_of_files():
     ]
 
 
-@router.get('/files/{filename}')  # select * from files where filename={filename}
+# select * from files where filename={filename}
+@router.get('/files/{filename}')
 def get_file(filename: str):
     return {
-        'filename': filename
+        'id': 1234,
+        'slug': 'abcde',
+        'filename': 'filename',
+        'link': 'http://fishare.io/slug',
+        'downloads': 0,
+        'maxDownloads': 1,
+        'size': 10000,
+        'mimeType': 'text/plain',
+        'created': '2021-12-02 08:16:12'
     }
 
 
