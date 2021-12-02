@@ -22,7 +22,10 @@ def get_file(filename: str):
         mime_type='video/mp4'
     )
 
-    return file.dict()
+    data = file.dict()
+    data['link'] = file.url()
+
+    return data
 
 
 @router.delete('/files/{filename}')  # delete from files where filename={filename}
