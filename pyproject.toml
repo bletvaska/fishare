@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "fishare"
+version = "0.1.0"
+description = "File sharing microservice."
+authors = ["Miroslav Biňas <miroslav.binas@tuke.sk>"]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+ipython = "^7.30.0"
+fastapi = "^0.70.0"
+uvicorn = "^0.15.0"
+httpie = "^2.6.0"
+fastapi-code-generator = "^0.3.2"
+
+[tool.poetry.dev-dependencies]
+pytest = "^6.2"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
