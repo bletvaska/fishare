@@ -4,9 +4,6 @@ from models.settings import Settings
 
 router = fastapi.APIRouter()
 
-settings = Settings()
-print(settings)
-
 
 @router.get('/files/')  # select * from files
 def list_of_files():
