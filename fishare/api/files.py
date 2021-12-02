@@ -1,7 +1,11 @@
 import fastapi
 from models.file import File
+from models.settings import Settings
 
 router = fastapi.APIRouter()
+
+settings = Settings()
+print(settings)
 
 
 @router.get('/files/')  # select * from files
