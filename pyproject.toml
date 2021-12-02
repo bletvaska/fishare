@@ -25,3 +25,4 @@ build-backend = "poetry.core.masonry.api"
 [tool.poetry.scripts]
 create_tables = "helpers:create_tables"
 populate_data = "helpers:populate_data"
+app = "main:main"

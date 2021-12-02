@@ -1,6 +1,12 @@
 import fastapi
+from starlette.responses import JSONResponse
+from sqlmodel import Session, select
+from sqlalchemy.exc import NoResultFound
+
 from models.file import File
 from models.settings import Settings
+from database import engine
+
 
 router = fastapi.APIRouter()
 
@@ -15,18 +21,38 @@ def list_of_files():
 
 
 # select * from files where filename={filename}
-@router.get('/files/{filename}')
-def get_file(filename: str):
-    file = File(
-        filename='batman.movie.avi',
-        size=1234567,
-        mime_type='video/mp4'
-    )
+@router.get('/files/{slug}')
+def get_file(slug: str):
+    try:
+        with Session(engine) as session:
+            statement = select(File).where(File.slug == slug)
+            file = session.exec(statement).one()
+            return file
 
-    data = file.dict()
-    data['link'] = file.url()
+    except NoResultFound as ex:
+        content = {
+            'error': 'File not found.',
+            'detail':{
+                'slug': f'No file with slug "{slug}"'
+            }
+        }
+        return JSONResponse(
+            status_code=404,
+            content=content
+        )
 
-    return data
+    except Exception as ex:
+        return JSONResponse(
+            status_code=500,
+            content={
+                'error': 'Unknown error occurred.'
+            }
+        )
+
+
+        # data['link'] = file.url()
+
+        # return data
 
 
 @router.delete('/files/{filename}')  # delete from files where filename={filename}
