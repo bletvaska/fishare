@@ -1,9 +1,15 @@
 from random import choice, randint
-from models.file import File
 from sqlmodel import SQLModel, Session
 from faker import Faker
+from time import sleep
+import secrets
+from datetime import datetime
 
+from models.file import File
+from models.settings import Settings
 from database import engine
+
+settings = Settings()
 
 
 def create_tables():
@@ -13,20 +19,24 @@ def create_tables():
 def populate_data():
     faker = Faker()
 
-    categories = ('audio', 'video', 'image')
+    categories = ('audio', 'video', 'image', 'text')
 
-    category = choice(categories)
+    with Session(engine) as session:
+        for _ in range(10):
+            category = choice(categories)
 
-    file = File(
-        filename=faker.file_name(category),
-        size=randint(10, 1000000),
-        mime_type=faker.mime_type(category)
-    )
+            file = File(
+                filename=faker.file_name(category),
+                size=randint(10, 1000000),
+                mime_type=faker.mime_type(category),
+                slug=secrets.token_urlsafe(settings.slug_length),
+                created = datetime.now()
+            )
 
-    print(repr(file))
+            print(repr(file))
 
-    session = Session(engine)
-    session.add(file)
-    session.commit()
+            session.add(file)
+            session.commit()
+            session.refresh(file)
 
-
+            # sleep(0.5)
