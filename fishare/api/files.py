@@ -7,14 +7,18 @@ from models.file import File
 from models.settings import Settings
 from database import engine
 
+from fastapi import Request
 
 router = fastapi.APIRouter()
 
 
 @router.get('/files/')  # select * from files
-def list_of_files():
+def list_of_files(request: Request, offset: int = 0, page: int = 10):
+    print(f'offset: {offset}')
+    print(f'page: {page}')
+
     with Session(engine) as session:
-        statement = select(File)
+        statement = select(File).offset(offset).limit(page)
         return session.exec(statement).all()
 
 
@@ -34,7 +38,7 @@ def get_file(slug: str):
     except NoResultFound as ex:
         content = {
             'error': 'File not found.',
-            'detail':{
+            'detail': {
                 'slug': f'No file with slug "{slug}"'
             }
         }
@@ -50,7 +54,6 @@ def get_file(slug: str):
                 'error': 'Unknown error occurred.'
             }
         )
-
 
         # data['link'] = file.url()
 
