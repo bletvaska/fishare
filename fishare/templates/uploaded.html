@@ -6,7 +6,7 @@
 
     <p class="message">Your file is ready to share!</p>
     <p class="url">
-        <a href="{{ url_for('download_file', file_id=key) }}">{{ url_for('download_file', file_id=key) }}</a>
+        <a href="{{ url_for('download_file', slug=slug) }}">{{ url_for('download_file', slug=slug) }}</a>
     </p>
 
 {% endblock %}

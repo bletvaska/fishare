@@ -4,7 +4,7 @@ from fastapi.staticfiles import StaticFiles
 
 from fishare.api import files
 from fishare.api import users
-from fishare.views import homepage, cron
+from fishare.views import homepage, cron, uploaded, download_file
 from fishare.models.settings import Settings
 
 settings = Settings()
@@ -14,6 +14,8 @@ app.include_router(files.router, prefix='/api/v1')
 app.include_router(users.router, prefix='/api/v1')
 app.include_router(homepage.router)
 app.include_router(cron.router)
+app.include_router(uploaded.router)
+app.include_router(download_file.router)
 
 app.mount('/static', StaticFiles(directory='fishare/static'), name='static')
 

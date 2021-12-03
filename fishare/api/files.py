@@ -2,7 +2,7 @@ import shutil
 from datetime import datetime
 import secrets
 
-from starlette.responses import JSONResponse
+from starlette.responses import JSONResponse, RedirectResponse
 from sqlmodel import Session, select
 from sqlalchemy.exc import NoResultFound
 from fastapi import Request, APIRouter, UploadFile
@@ -154,7 +154,7 @@ def create_file(request: Request, payload: UploadFile = fastapi.File(...)):
         slug=secret_name,
         filename=payload.filename,
         mime_type=payload.content_type,
-        size=0,
+        size=path.stat().st_size,
         created=datetime.now()
     )
 
@@ -163,6 +163,9 @@ def create_file(request: Request, payload: UploadFile = fastapi.File(...)):
         session.add(file)
         session.commit()
         session.refresh(file)
+
+    return RedirectResponse(f'/uploaded/?slug={file.slug}', status_code=302)
+
 
     # return newly created file
     return JSONResponse(
