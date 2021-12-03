@@ -1,3 +1,4 @@
+import shutil
 from datetime import datetime
 import secrets
 
@@ -138,7 +139,11 @@ def partial_file_update(filename: str):
 def create_file(request: Request, payload: UploadFile = fastapi.File(...)):
     # get ready
     secret_name = secrets.token_urlsafe(settings.slug_length)
-    # path = ??? / secret_name
+    path = settings.storage / secret_name
+
+    # save uploaded file
+    with open(path, 'wb') as dest:
+        shutil.copyfileobj(payload.file, dest)
 
     # prepare the file entry
     file = File(
