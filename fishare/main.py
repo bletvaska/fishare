@@ -5,6 +5,9 @@ from fastapi.staticfiles import StaticFiles
 from fishare.api import files
 from fishare.api import users
 from fishare.views import homepage, cron
+from fishare.models.settings import Settings
+
+settings = Settings()
 
 app = FastAPI()
 app.include_router(files.router, prefix='/api/v1')

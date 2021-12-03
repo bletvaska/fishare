@@ -1,7 +1,8 @@
 from starlette.responses import JSONResponse
 from sqlmodel import Session, select
 from sqlalchemy.exc import NoResultFound
-from fastapi import Request, APIRouter, UploadFile, File
+from fastapi import Request, APIRouter, UploadFile
+import fastapi
 
 from fishare.models.file import File
 from fishare.models.settings import Settings
@@ -15,7 +16,6 @@ settings = Settings()
 
 @router.get('/files/')  # select * from files
 def list_of_files(request: Request, offset: int = 0, page: int = 10):
-
     # TODO zistit, ako ziskat pocet vsetkych suborov
     count_files = 1000
 
@@ -131,7 +131,7 @@ def partial_file_update(filename: str):
 #     title: str
 
 # insert into files values ()
-# @router.post('/files/')
-# def create_file(request: Request, payload: UploadFile = File(...)):
-#     # print(person)
-#     return "file was created"
+@router.post('/files/')
+def create_file(request: Request, payload: UploadFile = fastapi.File(...)):
+    print('hello world')
+    return "file was created"

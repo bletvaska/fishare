@@ -7,4 +7,4 @@ templates = Jinja2Templates(directory='fishare/templates/')
 
 @router.get('/')
 def hello(request: Request):
-    return templates.TemplateResponse('home.html', {'request': request})
+    return templates.TemplateResponse('home.html', {'request': request, 'title': 'fishare Service'})
