@@ -166,7 +166,6 @@ def create_file(request: Request, payload: UploadFile = fastapi.File(...)):
 
     return RedirectResponse(f'/uploaded/?slug={file.slug}', status_code=302)
 
-
     # return newly created file
     return JSONResponse(
         status_code=201,
