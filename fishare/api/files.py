@@ -1,3 +1,6 @@
+from datetime import datetime
+import secrets
+
 from starlette.responses import JSONResponse
 from sqlmodel import Session, select
 from sqlalchemy.exc import NoResultFound
@@ -133,5 +136,27 @@ def partial_file_update(filename: str):
 # insert into files values ()
 @router.post('/files/')
 def create_file(request: Request, payload: UploadFile = fastapi.File(...)):
-    print('hello world')
-    return "file was created"
+    # get ready
+    secret_name = secrets.token_urlsafe(settings.slug_length)
+    # path = ??? / secret_name
+
+    # prepare the file entry
+    file = File(
+        slug=secret_name,
+        filename=payload.filename,
+        mime_type=payload.content_type,
+        size=0,
+        created=datetime.now()
+    )
+
+    # insert file in to db
+    with Session(engine) as session:
+        session.add(file)
+        session.commit()
+        session.refresh(file)
+
+    # return newly created file
+    return JSONResponse(
+        status_code=201,
+        content=file.json()
+    )
