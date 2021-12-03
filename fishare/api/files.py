@@ -141,6 +141,10 @@ def create_file(request: Request, payload: UploadFile = fastapi.File(...)):
     secret_name = secrets.token_urlsafe(settings.slug_length)
     path = settings.storage / secret_name
 
+    # check if storage directory exists
+    if not settings.storage.is_dir():
+        settings.storage.mkdir(parents=True, exist_ok=True)
+
     # save uploaded file
     with open(path, 'wb') as dest:
         shutil.copyfileobj(payload.file, dest)
