@@ -1,28 +1,50 @@
 from starlette.responses import JSONResponse
 from sqlmodel import Session, select
 from sqlalchemy.exc import NoResultFound
-from fastapi import Request, APIRouter
+from fastapi import Request, APIRouter, UploadFile, File
 
 from fishare.models.file import File
 from fishare.models.settings import Settings
 from fishare.database import engine
 
+# from pydantic import BaseModel
+
 router = APIRouter()
+settings = Settings()
 
 
 @router.get('/files/')  # select * from files
 def list_of_files(request: Request, offset: int = 0, page: int = 10):
 
+    # TODO zistit, ako ziskat pocet vsetkych suborov
+    count_files = 1000
+
+    # set next link
+    next_offset = offset + page
+    if next_offset > count_files:
+        next_link = None
+    else:
+        next_link = f'{settings.base_url}/api/v1/files/?offset={offset + page}&page={page}'
+
+    # set previous link
+    prev_offset = offset - page
+    if prev_offset < 0:
+        previous_link = None
+    else:
+        previous_link = f'{settings.base_url}/api/v1/files/?offset={offset - page}&page={page}'
+
     response = {
         "count": 0,
-        "next": None,
-        "previous": None,
+        "next": next_link,
+        "previous": previous_link,
         "results": []
     }
 
     with Session(engine) as session:
         statement = select(File).offset(offset).limit(page)
         response['results'].extend(session.exec(statement).all())
+
+        return response
 
 
 # select * from files where filename={filename}
@@ -105,6 +127,11 @@ def partial_file_update(filename: str):
     return "partial update"
 
 
-@router.post('/files/')  # insert into files values ()
-def create_file():
-    return "file was created"
+# class Person(BaseModel):
+#     title: str
+
+# insert into files values ()
+# @router.post('/files/')
+# def create_file(request: Request, payload: UploadFile = File(...)):
+#     # print(person)
+#     return "file was created"

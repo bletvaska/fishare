@@ -10,6 +10,8 @@ fastapi = "^0.70.0"
 uvicorn = "^0.15.0"
 python-dotenv = "^0.19.2"
 sqlmodel = "^0.0.4"
+python-multipart = "^0.0.5"
+Jinja2 = "^3.0.3"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2"
