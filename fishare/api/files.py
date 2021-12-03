@@ -58,9 +58,40 @@ def get_file(slug: str):
         # return data
 
 
-@router.delete('/files/{slug}')  # delete from files where filename={filename}
+# delete from files where filename={filename}
+@router.delete('/files/{slug}')
 def delete_file(slug: str):
-    return "deleted"
+    try:
+        with Session(engine) as session:
+            statement = select(File).where(File.slug == slug)
+            file = session.exec(statement).one()
+
+            session.delete(file)
+            session.commit()
+
+            return JSONResponse(
+                status_code=204
+            )
+
+    except NoResultFound as ex:
+        content = {
+            'error': 'File not found.',
+            'detail': {
+                'slug': f'No file with slug "{slug}"'
+            }
+        }
+        return JSONResponse(
+            status_code=404,
+            content=content
+        )
+
+    except Exception as ex:
+        return JSONResponse(
+            status_code=500,
+            content={
+                'error': 'Unknown error occurred.'
+            }
+        )
 
 
 @router.put('/files/{filename}')  # update files where filename={filename} set ...  # full update
