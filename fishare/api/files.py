@@ -12,12 +12,17 @@ router = APIRouter()
 
 @router.get('/files/')  # select * from files
 def list_of_files(request: Request, offset: int = 0, page: int = 10):
-    print(f'offset: {offset}')
-    print(f'page: {page}')
+
+    response = {
+        "count": 0,
+        "next": None,
+        "previous": None,
+        "results": []
+    }
 
     with Session(engine) as session:
         statement = select(File).offset(offset).limit(page)
-        return session.exec(statement).all()
+        response['results'].extend(session.exec(statement).all())
 
 
 # select * from files where filename={filename}
@@ -52,10 +57,6 @@ def get_file(slug: str):
                 'error': 'Unknown error occurred.'
             }
         )
-
-        # data['link'] = file.url()
-
-        # return data
 
 
 # delete from files where filename={filename}
