@@ -2,6 +2,7 @@ import secrets
 from datetime import datetime
 from typing import Optional
 
+from pydantic import validator
 from sqlmodel import SQLModel, Field
 
 from fishare.models.settings import Settings
@@ -17,7 +18,11 @@ class File(SQLModel, table=True):
     max_downloads: int = 1
     size: int
     mime_type: str
-    created: datetime = datetime.now()
+    created: datetime = None
+
+    @validator('created', pre=True, always=True)
+    def set_created_now(cls, v):
+        return v or datetime.now()
 
     def url(self):
         return f'{settings.base_url}/api/v1/files/{self.slug}'

@@ -1,13 +1,12 @@
-from random import choice, randint
-from sqlmodel import SQLModel, Session
-from faker import Faker
-from time import sleep
 import secrets
-from datetime import datetime
+from random import choice, randint
 
+from faker import Faker
+from sqlmodel import SQLModel, Session
+
+from fishare.database import engine
 from fishare.models.file import File
 from fishare.models.settings import Settings
-from fishare.database import engine
 
 settings = Settings()
 
@@ -35,14 +34,9 @@ def populate_data():
                 filename=faker.file_name(category),
                 size=randint(10, 1000000),
                 mime_type=faker.mime_type(category),
-                slug=secrets.token_urlsafe(settings.slug_length),
-                created = datetime.now()
+                slug=secrets.token_urlsafe(settings.slug_length)
             )
-
-            # print(repr(file))
 
             session.add(file)
             session.commit()
             session.refresh(file)
-
-            # sleep(0.5)

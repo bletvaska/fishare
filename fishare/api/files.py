@@ -1,18 +1,17 @@
-import shutil
-from datetime import datetime
 import secrets
+import shutil
 
-from starlette.responses import JSONResponse, RedirectResponse
-from sqlmodel import Session, select
-from sqlalchemy.exc import NoResultFound
-from fastapi import Request, APIRouter, UploadFile
 import fastapi
+from fastapi import Request, APIRouter, UploadFile
+from sqlalchemy.exc import NoResultFound
+from sqlmodel import Session, select
+from starlette.responses import JSONResponse, RedirectResponse
 
-from fishare.models.file import File
-from fishare.models.settings import Settings
+from fishare.core.responses import ProblemJSONResponse
 from fishare.database import engine
-
-# from pydantic import BaseModel
+from fishare.models.file import File
+from fishare.models.problem_details import ProblemDetails
+from fishare.models.settings import Settings
 
 router = APIRouter()
 settings = Settings()
@@ -65,15 +64,16 @@ def get_file(slug: str):
             return data
 
     except NoResultFound as ex:
-        content = {
-            'error': 'File not found.',
-            'detail': {
-                'slug': f'No file with slug "{slug}"'
-            }
-        }
-        return JSONResponse(
+        content = ProblemDetails(
+            title='File not found.',
+            detail=f"No file with slug '{slug}'",
+            status=404,
+            instance=f'/files/{slug}'
+        )
+
+        return ProblemJSONResponse(
             status_code=404,
-            content=content
+            content=content.dict()
         )
 
     except Exception as ex:
@@ -131,9 +131,6 @@ def partial_file_update(filename: str):
     return "partial update"
 
 
-# class Person(BaseModel):
-#     title: str
-
 # insert into files values ()
 @router.post('/files/')
 def create_file(request: Request, payload: UploadFile = fastapi.File(...)):
@@ -154,8 +151,7 @@ def create_file(request: Request, payload: UploadFile = fastapi.File(...)):
         slug=secret_name,
         filename=payload.filename,
         mime_type=payload.content_type,
-        size=path.stat().st_size,
-        created=datetime.now()
+        size=path.stat().st_size
     )
 
     # insert file in to db
