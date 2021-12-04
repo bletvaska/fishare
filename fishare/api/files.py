@@ -134,9 +134,14 @@ def partial_file_update(filename: str):
 # insert into files values ()
 @router.post('/files/')
 def create_file(request: Request, payload: UploadFile = fastapi.File(...)):
+    # prepare the file entry
+    file = File(
+        filename=payload.filename,
+        content_type=payload.content_type,
+    )
+
     # get ready
-    secret_name = secrets.token_urlsafe(settings.slug_length)
-    path = settings.storage / secret_name
+    path = settings.storage / file.slug
 
     # check if storage directory exists
     if not settings.storage.is_dir():
@@ -145,14 +150,7 @@ def create_file(request: Request, payload: UploadFile = fastapi.File(...)):
     # save uploaded file
     with open(path, 'wb') as dest:
         shutil.copyfileobj(payload.file, dest)
-
-    # prepare the file entry
-    file = File(
-        slug=secret_name,
-        filename=payload.filename,
-        mime_type=payload.content_type,
-        size=path.stat().st_size
-    )
+        file.size = path.stat().st_size
 
     # insert file in to db
     with Session(engine) as session:

@@ -33,8 +33,7 @@ def populate_data():
             file = File(
                 filename=faker.file_name(category),
                 size=randint(10, 1000000),
-                mime_type=faker.mime_type(category),
-                slug=secrets.token_urlsafe(settings.slug_length)
+                content_type=faker.mime_type(category)
             )
 
             session.add(file)
