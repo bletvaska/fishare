@@ -1,8 +1,10 @@
 import secrets
 import shutil
+from datetime import datetime
 
 import fastapi
-from fastapi import Request, APIRouter, UploadFile
+from fastapi import Request, APIRouter, UploadFile, Form
+from fastapi.encoders import jsonable_encoder
 from sqlalchemy.exc import NoResultFound
 from sqlmodel import Session, select
 from starlette.responses import JSONResponse, RedirectResponse
@@ -122,18 +124,62 @@ def delete_file(slug: str):
         )
 
 
-@router.put('/files/{filename}')  # update files where filename={filename} set ...  # full update
-def full_update_file(filename: str):
+# update files where filename={filename} set ...  # full update
+@router.patch('/files/{slug}')
+def partial_file_update(slug: str):
+    # najdi subor
+    # ak neni, tak ERROR
+    #
     return "full update"
 
 
-@router.patch('/files/{filename}')  # update files where filename={filename} set ... # partial update
-def partial_file_update(filename: str):
-    return "partial update"
+# update files where filename={filename} set ... # partial update
+
+@router.put('/files/{slug}', response_model=File)
+def full_update_file(slug: str,
+                     payload: UploadFile = fastapi.File(...),
+                     filename: str = Form(...),
+                     max_downloads: int = Form(...)):
+    try:
+        # get existing file from db
+        with Session(engine) as session:
+            statement = select(File).where(File.slug == slug)
+            file = session.exec(statement).one()
+
+            # upload new file and update/overwrite existing file/attributes
+            path = settings.storage / slug
+            with open(path, 'wb') as dest:
+                shutil.copyfileobj(payload.file, dest)
+
+            # update the file object
+            file.size = path.stat().st_size
+            file.filename = filename
+            file.max_downloads = max_downloads
+            file.content_type = payload.content_type
+            file.updated_at = datetime.now()
+
+            session.add(file)
+            session.commit()
+            session.refresh(file)
+
+            return file
+
+    except NoResultFound:
+        content = ProblemDetails(
+            title='File not found.',
+            detail=f"No file with slug '{slug}'",
+            status=404,
+            instance=f'/files/{slug}'
+        )
+
+        return ProblemJSONResponse(
+            status_code=404,
+            content=content.dict(exclude_unset=True)
+        )
 
 
 # insert into files values ()
-@router.post('/files/')
+@router.post('/files/', response_model=File)
 def create_file(request: Request, payload: UploadFile = fastapi.File(...)):
     # prepare the file entry
     file = File(
@@ -151,7 +197,9 @@ def create_file(request: Request, payload: UploadFile = fastapi.File(...)):
     # save uploaded file
     with open(path, 'wb') as dest:
         shutil.copyfileobj(payload.file, dest)
-        file.size = path.stat().st_size
+
+    # get file size
+    file.size = path.stat().st_size
 
     # insert file in to db
     with Session(engine) as session:
@@ -164,5 +212,5 @@ def create_file(request: Request, payload: UploadFile = fastapi.File(...)):
     # return newly created file
     return JSONResponse(
         status_code=201,
-        content=file.json()
+        content=jsonable_encoder(file)
     )
