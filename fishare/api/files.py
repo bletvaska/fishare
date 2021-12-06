@@ -127,15 +127,59 @@ def delete_file(slug: str):
 
 # update files where filename={filename} set ...  # full update
 @router.patch('/files/{slug}')
-def partial_file_update(slug: str):
-    # najdi subor
-    # ak neni, tak ERROR
-    #
-    return "full update"
+def partial_file_update(slug: str,
+                        payload: Optional[UploadFile] = fastapi.File(None),
+                        filename: Optional[str] = Form(None),
+                        max_downloads: Optional[int] = Form(None)):
+    try:
+        # get existing file from db
+        with Session(engine) as session:
+            statement = select(File).where(File.slug == slug)
+            file = session.exec(statement).one()
+
+            # upload/override new file if provided
+            if payload is not None:
+                path = settings.storage / slug
+                with open(path, 'wb') as dest:
+                    shutil.copyfileobj(payload.file, dest)
+
+                # update the file object
+                file.size = path.stat().st_size
+                file.content_type = payload.content_type
+                file.updated_at = datetime.now()
+
+            # update filename if provided
+            if filename is not None:
+                file.filename = filename
+                file.updated_at = datetime.now()
+
+            # update max downloads if provided
+            if max_downloads is not None:
+                file.max_downloads = max_downloads
+                file.updated_at = datetime.now()
+
+            # commit changes to db
+            session.add(file)
+            session.commit()
+            session.refresh(file)
+
+            return file
+
+    except NoResultFound:
+        content = ProblemDetails(
+            title='File not found.',
+            detail=f"No file with slug '{slug}'",
+            status=404,
+            instance=f'/files/{slug}'
+        )
+
+        return ProblemJSONResponse(
+            status_code=404,
+            content=content.dict(exclude_unset=True)
+        )
 
 
 # update files where filename={filename} set ... # partial update
-
 @router.put('/files/{slug}')
 def full_update_file(slug: str,
                      payload: UploadFile = fastapi.File(...),
