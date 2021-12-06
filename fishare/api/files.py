@@ -104,24 +104,17 @@ def delete_file(slug: str):
                 status_code=204
             )
 
-    except NoResultFound as ex:
-        content = {
-            'error': 'File not found.',
-            'detail': {
-                'slug': f'No file with slug "{slug}"'
-            }
-        }
-        return JSONResponse(
-            status_code=404,
-            content=content
+    except NoResultFound:
+        content = ProblemDetails(
+            title='File not found.',
+            detail=f"No file with slug '{slug}'",
+            status=404,
+            instance=f'/files/{slug}'
         )
 
-    except Exception as ex:
-        return JSONResponse(
-            status_code=500,
-            content={
-                'error': 'Unknown error occurred.'
-            }
+        return ProblemJSONResponse(
+            status_code=404,
+            content=content.dict(exclude_unset=True)
         )
 
 
@@ -259,7 +252,7 @@ def create_file(request: Request,
         session.commit()
         session.refresh(file)
 
-    # return RedirectResponse(f'/uploaded/?slug={file.slug}', status_code=302)
+    return RedirectResponse(f'/uploaded/?slug={file.slug}', status_code=302)
 
     # return newly created file
     return JSONResponse(
