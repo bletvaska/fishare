@@ -73,7 +73,7 @@ def get_file(slug: str):
 
         return ProblemJSONResponse(
             status_code=404,
-            content=content.dict()
+            content=content.dict(exclude_unset=True)
         )
 
     except Exception as ex:
