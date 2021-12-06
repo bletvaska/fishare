@@ -1,6 +1,7 @@
 import secrets
 import shutil
 from datetime import datetime
+from typing import Optional
 
 import fastapi
 from fastapi import Request, APIRouter, UploadFile, Form
@@ -135,7 +136,7 @@ def partial_file_update(slug: str):
 
 # update files where filename={filename} set ... # partial update
 
-@router.put('/files/{slug}', response_model=File)
+@router.put('/files/{slug}')
 def full_update_file(slug: str,
                      payload: UploadFile = fastapi.File(...),
                      filename: str = Form(...),
@@ -180,12 +181,19 @@ def full_update_file(slug: str,
 
 # insert into files values ()
 @router.post('/files/', response_model=File)
-def create_file(request: Request, payload: UploadFile = fastapi.File(...)):
+def create_file(request: Request,
+                payload: UploadFile = fastapi.File(...),
+                filename: Optional[str] = Form(None),
+                max_downloads: Optional[int] = Form(None)):
     # prepare the file entry
     file = File(
-        filename=payload.filename,
+        filename=payload.filename if filename is None else filename,
         content_type=payload.content_type,
     )
+
+    # set max downloads, if provided
+    if max_downloads is not None:
+        file.max_downloads = max_downloads
 
     # get ready
     path = settings.storage / file.slug
@@ -207,7 +215,7 @@ def create_file(request: Request, payload: UploadFile = fastapi.File(...)):
         session.commit()
         session.refresh(file)
 
-    return RedirectResponse(f'/uploaded/?slug={file.slug}', status_code=302)
+    # return RedirectResponse(f'/uploaded/?slug={file.slug}', status_code=302)
 
     # return newly created file
     return JSONResponse(
