@@ -14,6 +14,7 @@ router = fastapi.APIRouter()
 settings = Settings()
 
 
+@router.head('/{slug}')
 @router.get('/{slug}')
 def download_file(request: Request, slug: str):
     try:

@@ -20,7 +20,7 @@ router = APIRouter()
 settings = Settings()
 
 
-@router.get('/subory/')
+@router.head('/files/')
 @router.get('/files/')  # select * from files
 def list_of_files(request: Request, offset: int = 0, page: int = 10):
     # TODO zistit, ako ziskat pocet vsetkych suborov
@@ -55,6 +55,7 @@ def list_of_files(request: Request, offset: int = 0, page: int = 10):
 
 
 # select * from files where filename={filename}
+@router.head('/files/{slug}')
 @router.get('/files/{slug}')
 def get_file(slug: str):
     try:
