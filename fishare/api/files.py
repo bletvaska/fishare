@@ -17,6 +17,7 @@ router = APIRouter()
 settings = Settings()
 
 
+@router.get('/subory/')
 @router.get('/files/')  # select * from files
 def list_of_files(request: Request, offset: int = 0, page: int = 10):
     # TODO zistit, ako ziskat pocet vsetkych suborov

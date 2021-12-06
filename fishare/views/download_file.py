@@ -44,7 +44,7 @@ def download_file(request: Request, slug: str):
             # vratim ho pouzivatelovi
             path = settings.storage / file.slug
             return FileResponse(path, media_type=file.content_type, filename=file.filename)
-        
+
     except NoResultFound:
         # ak neexistuje taky subor, tak ProblemJSONResponse
         content = ProblemDetails(
@@ -58,5 +58,3 @@ def download_file(request: Request, slug: str):
             status_code=404,
             content=content.dict(exclude_unset=True)
         )
-
-    return "hello world"
