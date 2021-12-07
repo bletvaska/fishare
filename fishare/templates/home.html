@@ -2,12 +2,18 @@
 
 {% block content %}
 
-    <h1>fishare</h1>
-    <form enctype="multipart/form-data" action="/api/v1/files/" method="post">
-        <div class="input-group">
-            <input class="form-control form-control-lg" name="payload" type="file">
-            <button class="btn btn-lg btn-primary" type="submit">Upload</button>
-        </div>
-    </form>
+    <h1><a href="/">fishare</a></h1>
+
+    <div id="upload-form">
+        <input class="form-control form-control-lg" name="payload" type="file">
+        <button class="btn btn-lg btn-primary">Upload</button>
+    </div>
+
+    <div id="info-box">
+        <p class="message">Your file is ready to share!</p>
+        <p class="url"></p>
+    </div>
+
+
 
 {% endblock %}

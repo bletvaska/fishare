@@ -2,7 +2,7 @@ import secrets
 from datetime import datetime
 from typing import Optional
 
-from pydantic import validator
+from pydantic import validator, BaseModel, HttpUrl
 from sqlmodel import SQLModel, Field
 
 from fishare.models.settings import Settings
@@ -33,13 +33,18 @@ class File(SQLModel, table=True):
     def set_secret_slug(cls, v):
         return v or secrets.token_urlsafe(settings.slug_length)
 
-    def url(self):
-        return f'{settings.base_url}/api/v1/files/{self.slug}'
 
-    # print / str
-    # def __str__(self):
-    #     return f'{self.filename} ({self.url()}) {self.size}B'
+class FileOut(BaseModel):
+    slug: str
+    filename: str
+    downloads: int
+    max_downloads: int
+    size: int
+    content_type: str
+    created_at: datetime
+    updated_at: datetime
+    url: HttpUrl = None
 
-    # repr
-    # def __repr__(self):
-    #     pass
+    @validator('url', always=True)
+    def set_file_url(cls, v, values):
+        return v or f'{settings.base_url}/{values["slug"]}'

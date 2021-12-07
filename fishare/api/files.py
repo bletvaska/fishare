@@ -1,4 +1,3 @@
-import secrets
 import shutil
 from datetime import datetime
 from typing import Optional
@@ -12,7 +11,7 @@ from starlette.responses import JSONResponse, RedirectResponse
 
 from fishare.core.responses import ProblemJSONResponse
 from fishare.database import engine
-from fishare.models.file import File
+from fishare.models.file import File, FileOut
 from fishare.models.problem_details import ProblemDetails
 from fishare.models.settings import Settings
 
@@ -21,7 +20,7 @@ settings = Settings()
 
 
 @router.head('/files/')
-@router.get('/files/')  # select * from files
+@router.get('/files/', summary='Gets list of files.')
 def list_of_files(request: Request, offset: int = 0, page: int = 10):
     # TODO zistit, ako ziskat pocet vsetkych suborov
     count_files = 1000
@@ -47,16 +46,21 @@ def list_of_files(request: Request, offset: int = 0, page: int = 10):
         "results": []
     }
 
+    # walk through files
     with Session(engine) as session:
         statement = select(File).offset(offset).limit(page)
-        response['results'].extend(session.exec(statement).all())
+        files = session.exec(statement).all()
+
+        # convert File model ot FileOut model
+        for file in files:
+            response['results'].append(FileOut(**file.dict()))
 
         return response
 
 
 # select * from files where filename={filename}
 @router.head('/files/{slug}')
-@router.get('/files/{slug}')
+@router.get('/files/{slug}', summary='Downloads the file identified by {slug}', response_model=FileOut)
 def get_file(slug: str):
     try:
         with Session(engine) as session:
@@ -91,7 +95,7 @@ def get_file(slug: str):
 
 
 # delete from files where filename={filename}
-@router.delete('/files/{slug}')
+@router.delete('/files/{slug}', summary='Deletes the file identified by {slug}.')
 def delete_file(slug: str):
     try:
         with Session(engine) as session:
@@ -120,7 +124,10 @@ def delete_file(slug: str):
 
 
 # update files where filename={filename} set ...  # full update
-@router.patch('/files/{slug}')
+@router.patch('/files/{slug}',
+              response_model=FileOut,
+              summary='Updates the file identified by {slug}. For any parameters not provided in request, existing '
+                      'values are retained.')
 def partial_file_update(slug: str,
                         payload: Optional[UploadFile] = fastapi.File(None),
                         filename: Optional[str] = Form(None),
@@ -174,7 +181,9 @@ def partial_file_update(slug: str,
 
 
 # update files where filename={filename} set ... # partial update
-@router.put('/files/{slug}')
+@router.put('/files/{slug}',
+            response_model=FileOut,
+            summary='Updates the file identified by {slug}. Any parameters not provided are reset to defaults.')
 def full_update_file(slug: str,
                      payload: UploadFile = fastapi.File(...),
                      filename: str = Form(...),
@@ -218,7 +227,7 @@ def full_update_file(slug: str,
 
 
 # insert into files values ()
-@router.post('/files/', response_model=File)
+@router.post('/files/', summary='Uploads file and creates file details.')
 def create_file(request: Request,
                 payload: UploadFile = fastapi.File(...),
                 filename: Optional[str] = Form(None),
@@ -253,10 +262,11 @@ def create_file(request: Request,
         session.commit()
         session.refresh(file)
 
-    return RedirectResponse(f'/uploaded/?slug={file.slug}', status_code=302)
+    # return RedirectResponse(f'/uploaded/?slug={file.slug}', status_code=302)
 
     # return newly created file
+    response = FileOut(**file.dict())
     return JSONResponse(
         status_code=201,
-        content=jsonable_encoder(file)
+        content=jsonable_encoder(response)
     )
