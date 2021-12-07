@@ -1,4 +1,5 @@
 import fastapi
+from fastapi import Request
 from sqlmodel import select, Session
 from starlette.responses import JSONResponse
 
@@ -11,13 +12,14 @@ settings = Settings()
 
 
 @router.get('/cron')
-def run_cron():
+def run_cron(request: Request):
     # chceme zmazat vsetky subory, ktorych downloads >= maxDownloads
     with Session(engine) as session:
         statement = select(File)
         files = session.exec(statement).all()
 
         for file in files:
+            # remove file
             if file.downloads >= file.max_downloads:
                 print(f'>> Removing file "{file.filename}" with slug "{file.slug}".')
                 # zmaze zo storage-u
