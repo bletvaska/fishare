@@ -1,16 +1,17 @@
 from datetime import datetime
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
+from sqlmodel import Session
 
+from fishare.database import get_session
 from fishare.models.settings import Settings
-from fishare.database import engine
 
 router = APIRouter()
 settings = Settings()
 
 
 @router.get('/', summary='Returns microservice health check.')
-def get_health():
+def get_health(session: Session = Depends(get_session)):
     return {
         'ts': datetime.now(),
         'status': 'running',
