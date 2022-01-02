@@ -23,7 +23,7 @@ def run_cron(request: Request, session: Session = Depends(get_session)):
             print(f'>> Removing file "{file.filename}" with slug "{file.slug}".')
             # zmaze zo storage-u
             path = settings.storage / file.slug
-            path.unlink()
+            path.unlink(True)
 
             # zmaze z databazy
             session.delete(file)

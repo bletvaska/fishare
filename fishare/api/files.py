@@ -1,3 +1,4 @@
+import logging
 import shutil
 from datetime import datetime
 from typing import Optional
@@ -12,16 +13,19 @@ from starlette.responses import JSONResponse, RedirectResponse
 from fishare.core.responses import ProblemJSONResponse
 from fishare.database import get_session
 from fishare.models.file import File, FileOut
+from fishare.models.pager import Pager
 from fishare.models.problem_details import ProblemDetails
 from fishare.models.settings import Settings
 
 router = APIRouter()
 settings = Settings()
+logger = logging.getLogger("fishare")
 
 
 @router.head('/files/')
 @router.get('/files/', summary='Gets list of files.')
 def list_of_files(request: Request, offset: int = 0, page: int = 10, session: Session = Depends(get_session)):
+    logger.warning('hello there')
     # TODO zistit, ako ziskat pocet vsetkych suborov
     count_files = 1000
 
@@ -39,12 +43,10 @@ def list_of_files(request: Request, offset: int = 0, page: int = 10, session: Se
     else:
         previous_link = f'{settings.base_url}/api/v1/files/?offset={offset - page}&page={page}'
 
-    response = {
-        "count": 0,
-        "next": next_link,
-        "previous": previous_link,
-        "results": []
-    }
+    response = Pager(
+        next=next_link,
+        previous=previous_link
+    )
 
     # walk through files
     statement = select(File).offset(offset).limit(page)
@@ -52,7 +54,7 @@ def list_of_files(request: Request, offset: int = 0, page: int = 10, session: Se
 
     # convert File model ot FileOut model
     for file in files:
-        response['results'].append(FileOut(**file.dict()))
+        response.results.append(FileOut(**file.dict()))
 
     return response
 

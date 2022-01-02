@@ -6,6 +6,6 @@ settings = Settings()
 engine = create_engine(settings.db_uri, echo=False)
 
 
-def get_session():
+def get_session() -> Session:
     with Session(engine) as session:
         yield session
