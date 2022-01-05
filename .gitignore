@@ -105,3 +105,4 @@ ENV/
 *.db
 poetry.lock
 .idea/
+reports/

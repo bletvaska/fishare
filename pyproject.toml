@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "fishare"
-version = "0.1.0"
+version = "2022.01"
 description = "File sharing microservice written with FastAPI."
 authors = ["Miroslav Biňas <miroslav.binas@tuke.sk>"]
 
@@ -13,6 +13,7 @@ sqlmodel = "^0.0.4"
 python-multipart = "^0.0.5"
 Jinja2 = "^3.0.3"
 fastapi-health = "^0.4.0"
+starlette-exporter = "^0.12.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2"
@@ -20,6 +21,8 @@ ipython = "^7.30.0"
 httpie = "^2.6.0"
 litecli = "^1.6.0"
 Faker = "^9.9.0"
+pytest-cov = "^3.0.0"
+pytest-html = "^3.1.1"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

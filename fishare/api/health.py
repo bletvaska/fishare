@@ -60,7 +60,7 @@ def health_status(session: Session = Depends(get_session)):
         'appVersion': __version__,  # security
         'python': 0.0,
         'storage': {
-            'path': settings.storage,  # security
+            'path': settings.storage.absolute(),  # security
             'exists': storage_available,
             'writable': storage_writable,
         },

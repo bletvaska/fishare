@@ -25,7 +25,6 @@ logger = logging.getLogger("fishare")
 @router.head('/files/')
 @router.get('/files/', summary='Gets list of files.')
 def list_of_files(request: Request, offset: int = 0, page: int = 10, session: Session = Depends(get_session)):
-    logger.warning('hello there')
     # TODO zistit, ako ziskat pocet vsetkych suborov
     count_files = 1000
 
