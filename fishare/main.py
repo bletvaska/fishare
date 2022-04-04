@@ -13,6 +13,13 @@ def get_list_of_files():
     ]
 
 
+@app.get('/api/v1/files/{filename}')
+def get_file(filename: str):
+    return {
+        'filename': filename
+    }
+
+
 @app.get('/hello/{name}')
 def greetings(name: str):
     return f'hello {name}'
