@@ -10,6 +10,7 @@ def hello():
 
 
 def main():
+    print('>> running')
     uvicorn.run('fishare.main:app', port=9000, host='0.0.0.0', reload=False)
 
 
