@@ -6,9 +6,11 @@ authors = ["Miroslav Biňas <miroslav.binas@tuke.sk>"]
 
 [tool.poetry.dependencies]
 python = "^3.10"
+fastapi = "^0.75.1"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2"
+ipython = "^8.2.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
