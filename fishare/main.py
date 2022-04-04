@@ -31,8 +31,13 @@ def delete_file(filename: str):
 
 
 @app.put('/api/v1/files/{filename}')
-def full_update_file(filename: str):
+def full_file_update(filename: str):
     return f'file {filename} is going to be fully updated'
+
+
+@app.patch('/api/v1/files/{filename}')
+def partial_file_update(filename: str):
+    return f'file {filename} is going to be partially updated'
 
 
 def main():
