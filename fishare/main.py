@@ -20,9 +20,9 @@ def get_file(filename: str):
     }
 
 
-@app.get('/hello/{name}')
-def greetings(name: str):
-    return f'hello {name}'
+@app.post('/api/v1/files/')
+def create_file():
+    return 'file was created'
 
 
 def main():
