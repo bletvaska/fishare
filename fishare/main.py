@@ -13,6 +13,7 @@ def get_list_of_files():
     ]
 
 
+@app.head('/api/v1/files/{filename}')
 @app.get('/api/v1/files/{filename}')
 def get_file(filename: str):
     return {
