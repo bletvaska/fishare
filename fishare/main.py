@@ -60,7 +60,7 @@ app.mount('/static', StaticFiles(directory=Path(__file__).parent / 'static'), na
 
 
 def main():
-    uvicorn.run('fishare.main:app', port=8080, host='127.0.0.1', reload=True)
+    uvicorn.run('fishare.main:app', port=8080, host='0.0.0.0', reload=True)
 
 
 if __name__ == '__main__':

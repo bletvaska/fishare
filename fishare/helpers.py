@@ -11,6 +11,7 @@ from fishare.models.settings import Settings
 settings = Settings()
 
 
+# TODO zrejme je to uz zbytocna funkcia
 def create_tables():
     """
     Creates empty tables based on loaded modules
@@ -39,4 +40,3 @@ def populate_data():
             session.add(file)
             session.commit()
             session.refresh(file)
-

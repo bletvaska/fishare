@@ -106,3 +106,5 @@ ENV/
 poetry.lock
 .idea/
 reports/
+
+data/
