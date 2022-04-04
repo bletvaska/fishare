@@ -7,6 +7,7 @@ authors = ["Miroslav Biňas <miroslav.binas@tuke.sk>"]
 [tool.poetry.dependencies]
 python = "^3.10"
 fastapi = "^0.75.1"
+uvicorn = "^0.17.6"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2"
@@ -15,3 +16,6 @@ ipython = "^8.2.0"
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+fishare = "fishare.main:main"  # python -m fishare.main:app
