@@ -3,17 +3,13 @@ from typing import List
 import fastapi
 from starlette.responses import JSONResponse
 
+from fishare.helper import populate_data
 from fishare.models.file import File, FileOut
 from fishare.models.problem_details import ProblemDetails
 
 router = fastapi.APIRouter()
 
-files = [
-    File(filename='jano.jpg', size=1234, mime_type='image/jpeg'),
-    File(filename='juro.jpg', size=21234, mime_type='image/jpeg'),
-    File(filename='main.py', size=234, mime_type='plain/text'),
-    File(filename='pesnicka.mp3', size=12000000, mime_type='audio/mp3'),
-]
+files = populate_data(1000)
 
 
 @router.get("/files/", response_model=List[FileOut], summary="Get list of files.")
@@ -57,11 +53,13 @@ def delete_file(slug: str):
             return JSONResponse(status_code=204)
 
     # when not found, then 404
-    content = ProblemDetails(type='/errors/files',
-                             title="File not found.",
-                             status=404,
-                             detail=f"File with slug '{slug}' was not found.",
-                             instance=f"/files/{slug}")
+    content = ProblemDetails(
+        type='/errors/files',
+        title="File not found.",
+        status=404,
+        detail=f"File with slug '{slug}' was not found.",
+        instance=f"/files/{slug}"
+    )
     return JSONResponse(status_code=404,
                         content=content.dict())
 
