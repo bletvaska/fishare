@@ -1,3 +1,4 @@
+import secrets
 from datetime import datetime, timedelta
 
 from pydantic import BaseModel, validator
@@ -23,3 +24,7 @@ class File(BaseModel):
     def set_expires(cls, value):
         expiry = datetime.now() + timedelta(days=1)
         return value or expiry
+
+    @validator('slug', pre=True, always=True)
+    def set_secret_slug(cls, value):
+        return value or secrets.token_urlsafe(5)
