@@ -23,21 +23,22 @@ def get_list_of_files(offset: int = 0, page_size: int = 5):
 
     # prepare next link
     if start + page_size >= len(files):
-        next = None
+        next_page = None
     else:
-        next = f'http://localhost:9000/api/v1/files/?offset={offset + 1}&page_size={page_size}'
+        next_page = f'http://localhost:9000/api/v1/files/?offset={offset + 1}&page_size={page_size}'
 
     # prepare previous link
-    if start - page_size < 0:
-        prev = None
+    if start - page_size <= 0:
+        prev_page = None
     else:
-        prev = f'http://localhost:9000/api/v1/files/?offset={offset - 1}&page_size={page_size}'
+        prev_page = f'http://localhost:9000/api/v1/files/?offset={offset - 1}&page_size={page_size}'
 
+    # get result
     return Pager(
         first=f'http://localhost:9000/api/v1/files/?page_size={page_size}',
         last=f'http://localhost:9000/api/v1/files/?page_size={page_size}&offset={(len(files) // page_size) - 1}',
-        next=next,
-        previous=prev,
+        next=next_page,
+        previous=prev_page,
         results=files[start:start + page_size]
     )
 
