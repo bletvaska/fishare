@@ -48,9 +48,22 @@ def create_file():
     return 'file was created'
 
 
-@router.delete('/files/{filename}', summary='Deletes the file identified by {slug}.')
-def delete_file(filename: str):
-    return f'file {filename} was deleted.'
+@router.delete('/files/{slug}', summary='Deletes the file identified by {slug}.')
+def delete_file(slug: str):
+    # search and delete file with 204
+    for file in files:
+        if file.slug == slug:
+            files.remove(file)
+            return JSONResponse(status_code=204)
+
+    # when not found, then 404
+    content = ProblemDetails(type='/errors/files',
+                             title="File not found.",
+                             status=404,
+                             detail=f"File with slug '{slug}' was not found.",
+                             instance=f"/files/{slug}")
+    return JSONResponse(status_code=404,
+                        content=content.dict())
 
 
 @router.put('/files/{filename}',
