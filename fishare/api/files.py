@@ -1,16 +1,20 @@
 import fastapi
 
+from fishare.models.file import File
+
 router = fastapi.APIRouter()
+
+files = [
+    File(filename='jano.jpg', size=1234, mime_type='image/jpeg'),
+    File(filename='juro.jpg', size=21234, mime_type='image/jpeg'),
+    File(filename='main.py', size=234, mime_type='plain/text'),
+    File(filename='pesnicka.mp3', size=12000000, mime_type='audio/mp3'),
+]
 
 
 @router.get("/files/")
 def get_list_of_files():
-    return [
-        "file1",
-        "file2",
-        "file3",
-        "file4"
-    ]
+    return files
 
 
 @router.head('/files/{filename}')
