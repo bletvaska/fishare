@@ -8,7 +8,8 @@ def get_list_of_files():
     return [
         "file1",
         "file2",
-        "file3"
+        "file3",
+        "file4"
     ]
 
 
