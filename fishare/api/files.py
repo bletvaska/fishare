@@ -5,6 +5,7 @@ from starlette.responses import JSONResponse
 
 from fishare.helper import populate_data
 from fishare.models.file import File, FileOut
+from fishare.models.pager import Pager
 from fishare.models.problem_details import ProblemDetails
 
 router = fastapi.APIRouter()
@@ -12,9 +13,33 @@ router = fastapi.APIRouter()
 files = populate_data(1000)
 
 
-@router.get("/files/", response_model=List[FileOut], summary="Get list of files.")
-def get_list_of_files():
-    return files
+@router.get("/files/", summary="Get list of files.")
+def get_list_of_files(offset: int = 0, page_size: int = 5):
+    print(f'query params: {offset} {page_size}')
+
+    start = offset * page_size
+    # from IPython import embed
+    # embed()
+
+    # prepare next link
+    if start + page_size >= len(files):
+        next = None
+    else:
+        next = f'http://localhost:9000/api/v1/files/?offset={offset + 1}&page_size={page_size}'
+
+    # prepare previous link
+    if start - page_size < 0:
+        prev = None
+    else:
+        prev = f'http://localhost:9000/api/v1/files/?offset={offset - 1}&page_size={page_size}'
+
+    return Pager(
+        first=f'http://localhost:9000/api/v1/files/?page_size={page_size}',
+        last=f'http://localhost:9000/api/v1/files/?page_size={page_size}&offset={(len(files) // page_size) - 1}',
+        next=next,
+        previous=prev,
+        results=files[start:start + page_size]
+    )
 
 
 @router.head('/files/{slug}')
