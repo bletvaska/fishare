@@ -1,3 +1,5 @@
+from typing import List
+
 import fastapi
 
 from fishare.models.file import File, FileOut
@@ -12,22 +14,19 @@ files = [
 ]
 
 
-@router.get("/files/")
+@router.get("/files/", response_model=List[FileOut], summary="Get list of files.")
 def get_list_of_files():
     return files
 
 
 @router.head('/files/{slug}')
-@router.get('/files/{slug}', response_model=FileOut)
+@router.get('/files/{slug}', response_model=FileOut, summary="Get file identified by the {slug}.")
 def get_file(slug: str):
-    fileobject = {}
-
     for file in files:
         if file.slug == slug:
-            fileobject = file
-            break
+            return file
 
-    return fileobject
+    return {}
 
     # found_file = next((file for file in files if file.slug == slug), None)
     # if found_file is None:
@@ -35,21 +34,24 @@ def get_file(slug: str):
     # return found_file
 
 
-@router.post('/files/')
+@router.post('/files/', summary='Uploads file and creates file details.')
 def create_file():
     return 'file was created'
 
 
-@router.delete('/files/{filename}')
+@router.delete('/files/{filename}', summary='Deletes the file identified by {slug}.')
 def delete_file(filename: str):
     return f'file {filename} was deleted.'
 
 
-@router.put('/files/{filename}')
+@router.put('/files/{filename}',
+            summary='Updates the file identified by {slug}. Any parameters not provided are reset to defaults.')
 def full_file_update(filename: str):
     return f'file {filename} is going to be fully updated'
 
 
-@router.patch('/files/{filename}')
+@router.patch('/files/{filename}',
+              summary='Updates the file identified by {slug}. For any parameters not provided in request, existing '
+                      'values are retained.')
 def partial_file_update(filename: str):
     return f'file {filename} is going to be partially updated'
