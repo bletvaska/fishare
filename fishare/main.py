@@ -1,44 +1,10 @@
 import uvicorn
 from fastapi import FastAPI
 
+from fishare.api import files
+
 app = FastAPI()
-
-
-@app.get("/api/v1/files/")
-def get_list_of_files():
-    return [
-        "file1",
-        "file2",
-        "file3"
-    ]
-
-
-@app.head('/api/v1/files/{filename}')
-@app.get('/api/v1/files/{filename}')
-def get_file(filename: str):
-    return {
-        'filename': filename
-    }
-
-
-@app.post('/api/v1/files/')
-def create_file():
-    return 'file was created'
-
-
-@app.delete('/api/v1/files/{filename}')
-def delete_file(filename: str):
-    return f'file {filename} was deleted.'
-
-
-@app.put('/api/v1/files/{filename}')
-def full_file_update(filename: str):
-    return f'file {filename} is going to be fully updated'
-
-
-@app.patch('/api/v1/files/{filename}')
-def partial_file_update(filename: str):
-    return f'file {filename} is going to be partially updated'
+app.include_router(files.router, prefix='/api/v1')
 
 
 def main():
