@@ -4,6 +4,7 @@ import fastapi
 from starlette.responses import JSONResponse
 
 from fishare.models.file import File, FileOut
+from fishare.models.problem_details import ProblemDetails
 
 router = fastapi.APIRouter()
 
@@ -28,15 +29,17 @@ def get_file(slug: str):
             return file
 
     # raise fastapi.HTTPException(status_code=404, detail="File not found!")
+    content = ProblemDetails(
+        type='/errors/files',
+        title="File not found.",
+        status=404,
+        detail=f"File with slug '{slug} was not found.'",
+        instance=f"/files/{slug}"
+    )
+
     return JSONResponse(
         status_code=404,
-        content={
-            "type": "/errors/files",
-            "title": "File not found.",
-            "status": 404,
-            "detail": f"File with slug '{slug} was not found.'",
-            "instance": f"/files/{slug}"
-        }
+        content=content.dict(exclude_unset=True)
     )
 
 
