@@ -1,6 +1,7 @@
 from typing import List
 
 import fastapi
+from starlette.responses import JSONResponse
 
 from fishare.models.file import File, FileOut
 
@@ -26,12 +27,17 @@ def get_file(slug: str):
         if file.slug == slug:
             return file
 
-    return {}
-
-    # found_file = next((file for file in files if file.slug == slug), None)
-    # if found_file is None:
-    #     raise fastapi.HTTPException(status_code=404, detail="File not found!")
-    # return found_file
+    # raise fastapi.HTTPException(status_code=404, detail="File not found!")
+    return JSONResponse(
+        status_code=404,
+        content={
+            "type": "/errors/files",
+            "title": "File not found.",
+            "status": 404,
+            "detail": f"File with slug '{slug} was not found.'",
+            "instance": f"/files/{slug}"
+        }
+    )
 
 
 @router.post('/files/', summary='Uploads file and creates file details.')
