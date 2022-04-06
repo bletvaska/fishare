@@ -1,6 +1,6 @@
 import fastapi
 
-from fishare.models.file import File
+from fishare.models.file import File, FileOut
 
 router = fastapi.APIRouter()
 
@@ -17,12 +17,22 @@ def get_list_of_files():
     return files
 
 
-@router.head('/files/{filename}')
-@router.get('/files/{filename}')
-def get_file(filename: str):
-    return {
-        'filename': filename
-    }
+@router.head('/files/{slug}')
+@router.get('/files/{slug}', response_model=FileOut)
+def get_file(slug: str):
+    fileobject = {}
+
+    for file in files:
+        if file.slug == slug:
+            fileobject = file
+            break
+
+    return fileobject
+
+    # found_file = next((file for file in files if file.slug == slug), None)
+    # if found_file is None:
+    #     raise fastapi.HTTPException(status_code=404, detail="File not found!")
+    # return found_file
 
 
 @router.post('/files/')
