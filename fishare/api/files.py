@@ -1,9 +1,10 @@
 import fastapi
-from sqlalchemy import create_engine
+from fastapi import Depends
 from sqlalchemy.exc import NoResultFound
-from sqlmodel import Session, select, delete
+from sqlmodel import Session, select
 from starlette.responses import JSONResponse, Response
 
+from fishare.database import get_session
 from fishare.models.file import FileOut, File
 from fishare.models.pager import Pager
 from fishare.models.problem_details import ProblemDetails
@@ -15,7 +16,7 @@ settings = Settings()
 
 
 @router.get("/files/", summary="Get list of files.")
-def get_list_of_files(offset: int = 0, page_size: int = 5):
+def get_list_of_files(offset: int = 0, page_size: int = 5, session: Session = Depends(get_session)):
     """
     Returns the Pager, which contains the list of files.
 
@@ -25,37 +26,34 @@ def get_list_of_files(offset: int = 0, page_size: int = 5):
     """
 
     try:
-        engine = create_engine(settings.db_uri)
+        # count nr of files
+        files_count = session.query(File).count()
 
-        with Session(engine) as session:
-            # count nr of files
-            files_count = session.query(File).count()
+        # get data
+        start = offset * page_size
+        statement = select(File).offset(start).limit(page_size)
+        files = session.exec(statement).all()
 
-            # get data
-            start = offset * page_size
-            statement = select(File).offset(start).limit(page_size)
-            files = session.exec(statement).all()
+        # prepare next link
+        if start + page_size >= files_count:
+            next_page = None
+        else:
+            next_page = f'{settings.base_url}/api/v1/files/?offset={offset + 1}&page_size={page_size}'
 
-            # prepare next link
-            if start + page_size >= files_count:
-                next_page = None
-            else:
-                next_page = f'{settings.base_url}/api/v1/files/?offset={offset + 1}&page_size={page_size}'
+        # prepare previous link
+        if start - page_size <= 0:
+            prev_page = None
+        else:
+            prev_page = f'{settings.base_url}/api/v1/files/?offset={offset - 1}&page_size={page_size}'
 
-            # prepare previous link
-            if start - page_size <= 0:
-                prev_page = None
-            else:
-                prev_page = f'{settings.base_url}/api/v1/files/?offset={offset - 1}&page_size={page_size}'
-
-            # get result
-            return Pager(
-                first=f'{settings.base_url}/api/v1/files/?page_size={page_size}',
-                last=f'{settings.base_url}/api/v1/files/?page_size={page_size}&offset={(files_count // page_size) - 1}',
-                next=next_page,
-                previous=prev_page,
-                results=files
-            )
+        # get result
+        return Pager(
+            first=f'{settings.base_url}/api/v1/files/?page_size={page_size}',
+            last=f'{settings.base_url}/api/v1/files/?page_size={page_size}&offset={(files_count // page_size) - 1}',
+            next=next_page,
+            previous=prev_page,
+            results=files
+        )
 
     except Exception as ex:
 
@@ -75,13 +73,10 @@ def get_list_of_files(offset: int = 0, page_size: int = 5):
 
 @router.head('/files/{slug}')
 @router.get('/files/{slug}', response_model=FileOut, summary="Get file identified by the {slug}.")
-def get_file(slug: str):
+def get_file(slug: str, session: Session = Depends(get_session)):
     try:
-        engine = create_engine(settings.db_uri)
-
-        with Session(engine) as session:
-            statement = select(File).where(File.slug == slug)
-            return session.exec(statement).one()
+        statement = select(File).where(File.slug == slug)
+        return session.exec(statement).one()
 
     except NoResultFound as ex:
         content = ProblemDetails(
@@ -104,26 +99,22 @@ def create_file():
 
 
 @router.delete('/files/{slug}', summary='Deletes the file identified by {slug}.')
-def delete_file(slug: str):
+def delete_file(slug: str, session: Session = Depends(get_session)):
     try:
-        engine = create_engine(settings.db_uri)
+        # session.query(File).filter(File.slug == slug).delete()
 
-        with Session(engine) as session:
-            # session.query(File).filter_by(slug=slug).delete()
+        # select file by slug
+        statement = select(File).where(File.slug == slug)
+        file = session.exec(statement).one()
 
-            # select file by slug
-            statement = select(File).where(File.slug == slug)
-            file = session.exec(statement).one()
+        # delete file
+        session.delete(file)
+        session.commit()
 
-            # delete file
-            session.delete(file)
-            session.commit()
-
-            # return 204
-            return Response(status_code=204)
+        # return 204
+        return Response(status_code=204)
 
     except NoResultFound as ex:
-
         # when not found, then 404
         content = ProblemDetails(
             type='/errors/files/delete',
