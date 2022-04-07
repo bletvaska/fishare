@@ -5,7 +5,7 @@ class Settings(BaseSettings):
     slug_length = 5
     port = 8000
     base_url: AnyHttpUrl = f'http://localhost:8000'
-    db_uri: str = 'sqlite:///data/database.db'
+    db_uri: str = 'sqlite:///database.db'
 
     class Config:
         env_file = '.env'
