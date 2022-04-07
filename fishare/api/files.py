@@ -1,15 +1,16 @@
 import fastapi
+from sqlalchemy import create_engine
+from sqlalchemy.exc import NoResultFound
+from sqlmodel import Session, select
 from starlette.responses import JSONResponse, Response
 
-from fishare.helper import populate_data
-from fishare.models.file import FileOut
+from fishare.models.file import FileOut, File
 from fishare.models.pager import Pager
 from fishare.models.problem_details import ProblemDetails
 from fishare.models.settings import Settings
 
 router = fastapi.APIRouter()
 
-# files = populate_data(1000)
 settings = Settings()
 
 
@@ -53,23 +54,27 @@ def get_list_of_files(offset: int = 0, page_size: int = 5):
 @router.head('/files/{slug}')
 @router.get('/files/{slug}', response_model=FileOut, summary="Get file identified by the {slug}.")
 def get_file(slug: str):
-    for file in files:
-        if file.slug == slug:
+    try:
+        engine = create_engine(settings.db_uri)
+
+        with Session(engine) as session:
+            statement = select(File).where(File.slug == slug)
+            file = session.exec(statement).one()
             return file
 
-    # raise fastapi.HTTPException(status_code=404, detail="File not found!")
-    content = ProblemDetails(
-        type='/errors/files',
-        title="File not found.",
-        status=404,
-        detail=f"File with slug '{slug} was not found.'",
-        instance=f"/files/{slug}"
-    )
+    except NoResultFound as ex:
+        content = ProblemDetails(
+            type='/errors/files',
+            title="File not found.",
+            status=404,
+            detail=f"File with slug '{slug} was not found.'",
+            instance=f"/files/{slug}"
+        )
 
-    return JSONResponse(
-        status_code=404,
-        content=content.dict(exclude_unset=True)
-    )
+        return JSONResponse(
+            status_code=404,
+            content=content.dict(exclude_unset=True)
+        )
 
 
 @router.post('/files/', summary='Uploads file and creates file details.')
