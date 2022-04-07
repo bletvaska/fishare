@@ -1,4 +1,4 @@
-from pydantic import BaseSettings, AnyHttpUrl, validator
+from pydantic import BaseSettings, AnyHttpUrl, validator, DirectoryPath
 
 
 class Settings(BaseSettings):
@@ -6,6 +6,7 @@ class Settings(BaseSettings):
     port = 8000
     base_url: AnyHttpUrl = f'http://localhost:8000'
     db_uri: str = 'sqlite:///database.db'
+    storage: DirectoryPath = 'storage/'
 
     class Config:
         env_file = '.env'

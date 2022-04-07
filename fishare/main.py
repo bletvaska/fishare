@@ -3,16 +3,16 @@ from fastapi import FastAPI
 from sqlmodel import create_engine, SQLModel
 
 from fishare.api import files
-from fishare.helper import populate_data
 from fishare.models.settings import Settings
 
 app = FastAPI()
 app.include_router(files.router, prefix='/api/v1')
 
-settings = Settings()
-
 
 def main():
+    # TODO fix if storage directory does not exist
+    settings = Settings()
+
     # init db
     engine = create_engine(settings.db_uri)
     SQLModel.metadata.create_all(engine)

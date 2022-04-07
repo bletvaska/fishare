@@ -1,5 +1,7 @@
+from typing import Optional
+
 import fastapi
-from fastapi import Depends
+from fastapi import Depends, Form, UploadFile
 from sqlalchemy.exc import NoResultFound
 from sqlmodel import Session, select
 from starlette.responses import JSONResponse, Response
@@ -94,8 +96,16 @@ def get_file(slug: str, session: Session = Depends(get_session)):
 
 
 @router.post('/files/', summary='Uploads file and creates file details.')
-def create_file():
-    return 'file was created'
+def create_file(payload: UploadFile = fastapi.File(...), filename: Optional[str] = Form(None), session: Session = Depends(get_session)):
+    from IPython import embed; embed()
+
+    file = File(
+        filename=payload.file if filename is None else filename,
+        size=1000,
+        mime_type=payload.content_type
+    )
+
+    return f'file {filename} was created'
 
 
 @router.delete('/files/{slug}', summary='Deletes the file identified by {slug}.')
