@@ -11,7 +11,7 @@ settings = Settings()
 
 
 def main():
-    uvicorn.run('fishare.main:app', port=9000, host='0.0.0.0', reload=True)
+    uvicorn.run('fishare.main:app', port=settings.port, host='0.0.0.0', reload=True)
 
 
 if __name__ == '__main__':

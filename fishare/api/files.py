@@ -5,10 +5,12 @@ from fishare.helper import populate_data
 from fishare.models.file import FileOut
 from fishare.models.pager import Pager
 from fishare.models.problem_details import ProblemDetails
+from fishare.models.settings import Settings
 
 router = fastapi.APIRouter()
 
 files = populate_data(1000)
+settings = Settings()
 
 
 @router.get("/files/", summary="Get list of files.")
@@ -30,18 +32,18 @@ def get_list_of_files(offset: int = 0, page_size: int = 5):
     if start + page_size >= len(files):
         next_page = None
     else:
-        next_page = f'http://localhost:9000/api/v1/files/?offset={offset + 1}&page_size={page_size}'
+        next_page = f'{settings.base_url}/api/v1/files/?offset={offset + 1}&page_size={page_size}'
 
     # prepare previous link
     if start - page_size <= 0:
         prev_page = None
     else:
-        prev_page = f'http://localhost:9000/api/v1/files/?offset={offset - 1}&page_size={page_size}'
+        prev_page = f'{settings.base_url}/api/v1/files/?offset={offset - 1}&page_size={page_size}'
 
     # get result
     return Pager(
-        first=f'http://localhost:9000/api/v1/files/?page_size={page_size}',
-        last=f'http://localhost:9000/api/v1/files/?page_size={page_size}&offset={(len(files) // page_size) - 1}',
+        first=f'{settings.base_url}/api/v1/files/?page_size={page_size}',
+        last=f'{settings.base_url}/api/v1/files/?page_size={page_size}&offset={(len(files) // page_size) - 1}',
         next=next_page,
         previous=prev_page,
         results=files[start:start + page_size]
