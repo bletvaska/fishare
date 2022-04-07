@@ -26,5 +26,4 @@ requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.scripts]
-fishare = "fishare.main:main"  # python -m fishare.main:app
-
+fishare = "fishare.main:main"  # python -m fishare_project.main:app
