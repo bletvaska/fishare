@@ -2,11 +2,13 @@ import uvicorn
 from fastapi import FastAPI
 from sqlmodel import create_engine, SQLModel
 
+from fishare.views import homepage
 from fishare.api import files
 from fishare.models.settings import Settings
 
 app = FastAPI()
 app.include_router(files.router, prefix='/api/v1')
+app.include_router(homepage.router, prefix='')
 
 
 def main():
