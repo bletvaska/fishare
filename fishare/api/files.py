@@ -1,5 +1,4 @@
 import shutil
-from time import sleep
 from typing import Optional
 
 import fastapi
@@ -19,14 +18,16 @@ router = fastapi.APIRouter()
 settings = Settings()
 
 
+# TODO
+# 1. PUT
+# 2. PATCH
+# 3. delete file after DELETE
+
+
 @router.get("/files/", summary="Get list of files.")
 def get_list_of_files(offset: int = 0, page_size: int = 5, session: Session = Depends(get_session)):
     """
     Returns the Pager, which contains the list of files.
-
-    :param offset: page offset
-    :param page_size: size of the page
-    :return: Pager object
     """
 
     try:
@@ -56,7 +57,8 @@ def get_list_of_files(offset: int = 0, page_size: int = 5, session: Session = De
             last=f'{settings.base_url}/api/v1/files/?page_size={page_size}&offset={(files_count // page_size) - 1}',
             next=next_page,
             previous=prev_page,
-            results=files
+            results=files,
+            count=files_count
         )
 
     except Exception as ex:
@@ -99,13 +101,14 @@ def get_file(slug: str, session: Session = Depends(get_session)):
 
 @router.post('/files/', response_model=FileOut, status_code=201,
              summary='Uploads file and creates file details.')
-def create_file(payload: UploadFile = fastapi.File(...), filename: Optional[str] = Form(None),
+def create_file(payload: UploadFile = fastapi.File(...), max_downloads: Optional[str] = Form(None),
                 session: Session = Depends(get_session)):
     # create file skeleton
     file = File(
-        filename=payload.file if filename is None else filename,
-        size=None,
-        mime_type=payload.content_type
+        filename=payload.filename,
+        size=-1,
+        mime_type=payload.content_type,
+        max_downloads=1 if max_downloads is None else max_downloads
     )
 
     # get ready
@@ -126,7 +129,8 @@ def create_file(payload: UploadFile = fastapi.File(...), filename: Optional[str]
     return file
 
 
-@router.delete('/files/{slug}', summary='Deletes the file identified by {slug}.')
+@router.delete('/files/{slug}', status_code=204,
+               summary='Deletes the file identified by {slug}.')
 def delete_file(slug: str, session: Session = Depends(get_session)):
     try:
         # session.query(File).filter(File.slug == slug).delete()
@@ -140,7 +144,8 @@ def delete_file(slug: str, session: Session = Depends(get_session)):
         session.commit()
 
         # return 204
-        return Response(status_code=204)
+        # return Response(status_code=204)
+        return
 
     except NoResultFound as ex:
         # when not found, then 404

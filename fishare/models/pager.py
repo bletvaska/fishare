@@ -11,3 +11,4 @@ class Pager(BaseModel):
     first: AnyHttpUrl = None
     last: AnyHttpUrl = None
     previous: AnyHttpUrl = None
+    count: int

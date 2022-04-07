@@ -1,6 +1,6 @@
 from typing import Optional
 
-from pydantic import BaseModel, FileUrl
+from pydantic import BaseModel
 
 
 class ProblemDetails(BaseModel):

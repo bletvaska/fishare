@@ -47,5 +47,4 @@ class FileOut(BaseModel):
 
     @validator('url', always=True)
     def set_file_url(cls, value, values):
-        print(values)
         return f'{settings.base_url}/{values["slug"]}'
