@@ -1,10 +1,8 @@
-from typing import List
-
 import fastapi
-from starlette.responses import JSONResponse
+from starlette.responses import JSONResponse, Response
 
 from fishare.helper import populate_data
-from fishare.models.file import File, FileOut
+from fishare.models.file import FileOut
 from fishare.models.pager import Pager
 from fishare.models.problem_details import ProblemDetails
 
@@ -15,6 +13,13 @@ files = populate_data(1000)
 
 @router.get("/files/", summary="Get list of files.")
 def get_list_of_files(offset: int = 0, page_size: int = 5):
+    """
+    Returns the Pager, which contains the list of files.
+
+    :param offset: page offset
+    :param page_size: size of the page
+    :return: Pager object
+    """
     print(f'query params: {offset} {page_size}')
 
     start = offset * page_size
@@ -76,7 +81,7 @@ def delete_file(slug: str):
     for file in files:
         if file.slug == slug:
             files.remove(file)
-            return JSONResponse(status_code=204)
+            return Response(status_code=204)
 
     # when not found, then 404
     content = ProblemDetails(
