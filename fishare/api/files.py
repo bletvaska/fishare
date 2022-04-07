@@ -1,3 +1,5 @@
+import shutil
+from time import sleep
 from typing import Optional
 
 import fastapi
@@ -95,17 +97,33 @@ def get_file(slug: str, session: Session = Depends(get_session)):
     )
 
 
-@router.post('/files/', summary='Uploads file and creates file details.')
-def create_file(payload: UploadFile = fastapi.File(...), filename: Optional[str] = Form(None), session: Session = Depends(get_session)):
-    from IPython import embed; embed()
-
+@router.post('/files/', response_model=FileOut, status_code=201,
+             summary='Uploads file and creates file details.')
+def create_file(payload: UploadFile = fastapi.File(...), filename: Optional[str] = Form(None),
+                session: Session = Depends(get_session)):
+    # create file skeleton
     file = File(
         filename=payload.file if filename is None else filename,
-        size=1000,
+        size=None,
         mime_type=payload.content_type
     )
 
-    return f'file {filename} was created'
+    # get ready
+    path = settings.storage / file.slug
+
+    # save uploaded file
+    with open(path, 'wb') as dest:
+        shutil.copyfileobj(payload.file, dest)
+
+    # get file size
+    file.size = path.stat().st_size
+
+    # save to db
+    session.add(file)
+    session.commit()
+    session.refresh(file)
+
+    return file
 
 
 @router.delete('/files/{slug}', summary='Deletes the file identified by {slug}.')
