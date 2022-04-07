@@ -23,31 +23,53 @@ def get_list_of_files(offset: int = 0, page_size: int = 5):
     :param page_size: size of the page
     :return: Pager object
     """
-    print(f'query params: {offset} {page_size}')
 
-    start = offset * page_size
-    # from IPython import embed
-    # embed()
+    try:
+        engine = create_engine(settings.db_uri)
 
-    # prepare next link
-    if start + page_size >= len(files):
-        next_page = None
-    else:
-        next_page = f'{settings.base_url}/api/v1/files/?offset={offset + 1}&page_size={page_size}'
+        with Session(engine) as session:
+            # count nr of files
+            files_count = session.query(File).count()
 
-    # prepare previous link
-    if start - page_size <= 0:
-        prev_page = None
-    else:
-        prev_page = f'{settings.base_url}/api/v1/files/?offset={offset - 1}&page_size={page_size}'
+            # get data
+            start = offset * page_size
+            statement = select(File).offset(start).limit(page_size)
+            files = session.exec(statement).all()
 
-    # get result
-    return Pager(
-        first=f'{settings.base_url}/api/v1/files/?page_size={page_size}',
-        last=f'{settings.base_url}/api/v1/files/?page_size={page_size}&offset={(len(files) // page_size) - 1}',
-        next=next_page,
-        previous=prev_page,
-        results=files[start:start + page_size]
+            # prepare next link
+            if start + page_size >= files_count:
+                next_page = None
+            else:
+                next_page = f'{settings.base_url}/api/v1/files/?offset={offset + 1}&page_size={page_size}'
+
+            # prepare previous link
+            if start - page_size <= 0:
+                prev_page = None
+            else:
+                prev_page = f'{settings.base_url}/api/v1/files/?offset={offset - 1}&page_size={page_size}'
+
+            # get result
+            return Pager(
+                first=f'{settings.base_url}/api/v1/files/?page_size={page_size}',
+                last=f'{settings.base_url}/api/v1/files/?page_size={page_size}&offset={(files_count // page_size) - 1}',
+                next=next_page,
+                previous=prev_page,
+                results=files
+            )
+
+    except Exception as ex:
+
+        content = ProblemDetails(
+            type='/errors/server',
+            title="Some error occured.",
+            status=500,
+            detail=str(ex),
+            instance=f"/files/?page_size={page_size}&offset={offset}"
+        )
+
+    return JSONResponse(
+        status_code=content.status,
+        content=content.dict(exclude_unset=True)
     )
 
 
@@ -59,12 +81,11 @@ def get_file(slug: str):
 
         with Session(engine) as session:
             statement = select(File).where(File.slug == slug)
-            file = session.exec(statement).one()
-            return file
+            return session.exec(statement).one()
 
     except NoResultFound as ex:
         content = ProblemDetails(
-            type='/errors/files',
+            type='/errors/files/get',
             title="File not found.",
             status=404,
             detail=f"File with slug '{slug} was not found.'",
