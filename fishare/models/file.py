@@ -3,6 +3,10 @@ from datetime import datetime, timedelta
 
 from pydantic import BaseModel, validator, HttpUrl
 
+from fishare.models.settings import Settings
+
+settings = Settings()
+
 
 class File(BaseModel):
     id: int = 0
@@ -27,7 +31,7 @@ class File(BaseModel):
 
     @validator('slug', always=True)
     def set_secret_slug(cls, value):
-        return secrets.token_urlsafe(5)
+        return secrets.token_urlsafe(settings.slug_length)
 
 
 class FileOut(BaseModel):
@@ -41,4 +45,4 @@ class FileOut(BaseModel):
 
     @validator('url', always=True)
     def set_file_url(cls, value, values):
-        return f'http://localhost:9000/{values["slug"]}'
+        return f'{settings.base_url}/{values["slug"]}'
