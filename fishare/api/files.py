@@ -9,7 +9,7 @@ from fishare.models.settings import Settings
 
 router = fastapi.APIRouter()
 
-files = populate_data(1000)
+# files = populate_data(1000)
 settings = Settings()
 
 

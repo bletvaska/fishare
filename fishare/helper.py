@@ -27,4 +27,3 @@ def populate_data(count: int = 10):
             session.add(file)
 
         session.commit()
-
