@@ -1,7 +1,7 @@
 import fastapi
 from sqlalchemy import create_engine
 from sqlalchemy.exc import NoResultFound
-from sqlmodel import Session, select
+from sqlmodel import Session, select, delete
 from starlette.responses import JSONResponse, Response
 
 from fishare.models.file import FileOut, File
@@ -92,10 +92,10 @@ def get_file(slug: str):
             instance=f"/files/{slug}"
         )
 
-        return JSONResponse(
-            status_code=404,
-            content=content.dict(exclude_unset=True)
-        )
+    return JSONResponse(
+        status_code=content.status,
+        content=content.dict(exclude_unset=True)
+    )
 
 
 @router.post('/files/', summary='Uploads file and creates file details.')
@@ -105,21 +105,35 @@ def create_file():
 
 @router.delete('/files/{slug}', summary='Deletes the file identified by {slug}.')
 def delete_file(slug: str):
-    # search and delete file with 204
-    for file in files:
-        if file.slug == slug:
-            files.remove(file)
+    try:
+        engine = create_engine(settings.db_uri)
+
+        with Session(engine) as session:
+            # session.query(File).filter_by(slug=slug).delete()
+
+            # select file by slug
+            statement = select(File).where(File.slug == slug)
+            file = session.exec(statement).one()
+
+            # delete file
+            session.delete(file)
+            session.commit()
+
+            # return 204
             return Response(status_code=204)
 
-    # when not found, then 404
-    content = ProblemDetails(
-        type='/errors/files',
-        title="File not found.",
-        status=404,
-        detail=f"File with slug '{slug}' was not found.",
-        instance=f"/files/{slug}"
-    )
-    return JSONResponse(status_code=404,
+    except NoResultFound as ex:
+
+        # when not found, then 404
+        content = ProblemDetails(
+            type='/errors/files/delete',
+            title="File not found.",
+            status=404,
+            detail=f"File with slug '{slug}' was not found.",
+            instance=f"/files/{slug}"
+        )
+
+    return JSONResponse(status_code=content.status,
                         content=content.dict())
 
 
