@@ -165,7 +165,7 @@ def delete_file(slug: str, session: Session = Depends(get_session)):
                         content=content.dict())
 
 
-@router.put('/files/{slug}',
+@router.put('/files/{slug}', response_model=FileOut,
             summary='Updates the file identified by {slug}. Any parameters not provided are reset to defaults.')
 def full_file_update(slug: str,
                      payload: Optional[UploadFile] = fastapi.File(...),
@@ -175,6 +175,8 @@ def full_file_update(slug: str,
                      ):
     # updated_at - bude treba aktualizovat
     # mime_type na zaklade suboru aktualizovaneho
+
+    # vo vysledk by mal vratit cely objekt aktualizovany (FileOut)
     return f'file {slug} is going to be fully updated'
 
 
