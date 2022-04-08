@@ -101,7 +101,8 @@ def get_file(slug: str, session: Session = Depends(get_session)):
 
 @router.post('/files/', response_model=FileOut, status_code=201,
              summary='Uploads file and creates file details.')
-def create_file(payload: UploadFile = fastapi.File(...), max_downloads: Optional[str] = Form(None),
+def create_file(payload: UploadFile = fastapi.File(...),
+                max_downloads: Optional[str] = Form(None),
                 session: Session = Depends(get_session)):
     # create file skeleton
     file = File(
@@ -139,13 +140,17 @@ def delete_file(slug: str, session: Session = Depends(get_session)):
         statement = select(File).where(File.slug == slug)
         file = session.exec(statement).one()
 
+        # delete file from storage
+        path = settings.storage / file.slug
+        path.unlink(missing_ok=True)
+
         # delete file
         session.delete(file)
         session.commit()
 
         # return 204
         # return Response(status_code=204)
-        return
+        return  # return None
 
     except NoResultFound as ex:
         # when not found, then 404
