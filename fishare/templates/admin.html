@@ -1,19 +1,16 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
-{{ title }}
+{% extends "base.html" %}
 
-<table border="1">
+{% block content %}
+<h1>List of Files</h1>
+
+<table class="table table-dark">
     <tr>
         <th>slug</th>
         <th>filename</th>
         <th>size</th>
         <th>downloads</th>
         <th>mime-type</th>
+        <th>created at</th>
     </tr>
 
     {% for file in files %}
@@ -22,14 +19,11 @@
         <td>
             <a href="{{ base_url }}/{{ file.slug }}">{{ file.filename }}</a>
         </td>
-        <td>{{ file.size }}</td>
+        <td>{{ file.size | filesizeformat }}</td>
         <td>{{ file.downloads }}/{{ file.max_downloads }}</td>
         <td>{{ file.mime_type }}</td>
+        <td>{{ file.created_at.strftime('%d.%m.%Y %H:%M') }}</td>
     </tr>
     {% endfor %}
-
-
 </table>
-
-</body>
-</html>
+{% endblock %}
