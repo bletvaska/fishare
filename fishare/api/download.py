@@ -1,8 +1,7 @@
 import fastapi
 from fastapi import Depends
-from requests import Session
 from sqlalchemy.exc import NoResultFound
-from sqlmodel import select
+from sqlmodel import select, Session
 from starlette.responses import JSONResponse, FileResponse
 
 from fishare.database import get_session
@@ -22,7 +21,9 @@ def download_file(slug: str, session: Session = Depends(get_session)):
         statement = select(File).where(File.slug == slug)
         file = session.exec(statement).one()
 
-        # check downloads
+        # if more downloads than max, then return 404
+        if file.downloads >= file.max_downloads:
+            raise NoResultFound
 
         # increment download counter
         file.downloads += 1

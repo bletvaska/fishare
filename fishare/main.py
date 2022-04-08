@@ -10,13 +10,18 @@ from fishare.api import files, cron, download
 from fishare.models.settings import Settings
 
 app = FastAPI()
+
+# rest api
 app.include_router(files.router, prefix='/api/v1/files')
 app.include_router(cron.router, prefix='/cron')
 app.include_router(download.router)
 
+# views
 app.include_router(homepage.router)
 
-app.mount('/static', StaticFiles(directory=Path(__file__).parent / 'static'), name='static')
+app.mount('/static',
+          StaticFiles(directory=Path(__file__).parent / 'static'),
+          name='static')
 
 
 def main():
