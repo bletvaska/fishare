@@ -5,7 +5,7 @@ from fastapi import FastAPI
 from sqlmodel import create_engine, SQLModel
 from starlette.staticfiles import StaticFiles
 
-from fishare.views import homepage
+from fishare.views import homepage, admin
 from fishare.api import files, cron, download
 from fishare.models.settings import Settings
 
@@ -18,6 +18,7 @@ app.include_router(download.router)
 
 # views
 app.include_router(homepage.router)
+app.include_router(admin.router)
 
 app.mount('/static',
           StaticFiles(directory=Path(__file__).parent / 'static'),
