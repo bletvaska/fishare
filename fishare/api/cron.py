@@ -27,11 +27,11 @@ def run_cron_job(session: Session = Depends(get_session)):
         path = settings.storage / file.slug
 
         # delete file
-        # session.delete(file)
-        # session.commit()
+        session.delete(file)
+        session.commit()
 
         # delete file from storage
-        # path.unlink(missing_ok=True)
+        path.unlink(missing_ok=True)
 
     # count duration
     end = datetime.now()

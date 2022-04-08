@@ -90,7 +90,7 @@ def get_file(slug: str, session: Session = Depends(get_session)):
             type='/errors/files/get',
             title="File not found.",
             status=404,
-            detail=f"File with slug '{slug} was not found.'",
+            detail=f"File with slug '{slug}' was not found.'",
             instance=f"/files/{slug}"
         )
 
