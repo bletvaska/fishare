@@ -21,7 +21,6 @@ settings = Settings()
 # TODO
 # 1. PUT
 # 2. PATCH
-# 3. delete file after DELETE
 
 
 @router.get("/files/", summary="Get list of files.")
@@ -166,10 +165,17 @@ def delete_file(slug: str, session: Session = Depends(get_session)):
                         content=content.dict())
 
 
-@router.put('/files/{filename}',
+@router.put('/files/{slug}',
             summary='Updates the file identified by {slug}. Any parameters not provided are reset to defaults.')
-def full_file_update(filename: str):
-    return f'file {filename} is going to be fully updated'
+def full_file_update(slug: str,
+                     payload: Optional[UploadFile] = fastapi.File(...),
+                     filename: str = Form(...),
+                     max_downloads: int = Form(...),
+                     session: Session = Depends(get_session)
+                     ):
+    # updated_at - bude treba aktualizovat
+    # mime_type na zaklade suboru aktualizovaneho
+    return f'file {slug} is going to be fully updated'
 
 
 @router.patch('/files/{filename}',
