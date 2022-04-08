@@ -7,6 +7,6 @@ from fishare.database import get_session
 router = fastapi.APIRouter()
 
 
-@router.get("/", summary="Get list of files.")
+@router.get("/", summary="Run background jobs.")
 def run_cron_job(session: Session = Depends(get_session)):
-    pass
+    return 'running cron jobs.'
