@@ -9,14 +9,25 @@
 
 <table border="1">
     <tr>
+        <th>slug</th>
         <th>filename</th>
         <th>size</th>
         <th>downloads</th>
         <th>mime-type</th>
     </tr>
 
+    {% for file in files %}
+    <tr>
+        <td>{{ file.slug }}</td>
+        <td>{{ file.filename }}</td>
+        <td>{{ file.size }}</td>
+        <td>{{ file.downloads }}/{{ file.max_downloads }}</td>
+        <td>{{ file.mime_type }}</td>
+    </tr>
+    {% endfor %}
+
 
 </table>
-{{ files }}
+
 </body>
 </html>
