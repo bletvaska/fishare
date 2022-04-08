@@ -10,7 +10,7 @@ from fishare.api import files
 from fishare.models.settings import Settings
 
 app = FastAPI()
-app.include_router(files.router, prefix='/api/v1')
+app.include_router(files.router, prefix='/api/v1/files')
 app.include_router(homepage.router)
 
 app.mount('/static', StaticFiles(directory=Path(__file__).parent / 'static'), name='static')

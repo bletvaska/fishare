@@ -6,7 +6,7 @@ import fastapi
 from fastapi import Depends, Form, UploadFile
 from sqlalchemy.exc import NoResultFound
 from sqlmodel import Session, select
-from starlette.responses import JSONResponse, Response
+from starlette.responses import JSONResponse
 
 from fishare.database import get_session
 from fishare.models.file import FileOut, File
@@ -20,13 +20,12 @@ settings = Settings()
 
 
 # TODO
-# 1. PUT
 # 2. PATCH
 # 3. JsonProblemResponse
 # 4. cron
 
 
-@router.get("/files/", summary="Get list of files.")
+@router.get("/", summary="Get list of files.")
 def get_list_of_files(offset: int = 0, page_size: int = 5, session: Session = Depends(get_session)):
     """
     Returns the Pager, which contains the list of files.
@@ -79,8 +78,8 @@ def get_list_of_files(offset: int = 0, page_size: int = 5, session: Session = De
     )
 
 
-@router.head('/files/{slug}')
-@router.get('/files/{slug}', response_model=FileOut, summary="Get file identified by the {slug}.")
+@router.head('/{slug}')
+@router.get('/{slug}', response_model=FileOut, summary="Get file identified by the {slug}.")
 def get_file(slug: str, session: Session = Depends(get_session)):
     try:
         statement = select(File).where(File.slug == slug)
@@ -101,7 +100,7 @@ def get_file(slug: str, session: Session = Depends(get_session)):
     )
 
 
-@router.post('/files/', response_model=FileOut, status_code=201,
+@router.post('/', response_model=FileOut, status_code=201,
              summary='Uploads file and creates file details.')
 def create_file(payload: UploadFile = fastapi.File(...),
                 max_downloads: Optional[str] = Form(None),
@@ -132,7 +131,7 @@ def create_file(payload: UploadFile = fastapi.File(...),
     return file
 
 
-@router.delete('/files/{slug}', status_code=204,
+@router.delete('/{slug}', status_code=204,
                summary='Deletes the file identified by {slug}.')
 def delete_file(slug: str, session: Session = Depends(get_session)):
     try:
@@ -168,10 +167,10 @@ def delete_file(slug: str, session: Session = Depends(get_session)):
                         content=content.dict())
 
 
-@router.put('/files/{slug}', response_model=FileOut,
+@router.put('/{slug}', response_model=FileOut,
             summary='Updates the file identified by {slug}. Any parameters not provided are reset to defaults.')
 def full_file_update(slug: str,
-                     payload: Optional[UploadFile] = fastapi.File(...),
+                     payload: UploadFile,  # UploadFile = fastapi.File(...)
                      filename: str = Form(None),
                      max_downloads: int = Form(...),
                      session: Session = Depends(get_session)
@@ -219,8 +218,8 @@ def full_file_update(slug: str,
                         content=content.dict())
 
 
-@router.patch('/files/{filename}',
+@router.patch('/{slug}',
               summary='Updates the file identified by {slug}. For any parameters not provided in request, existing '
                       'values are retained.')
-def partial_file_update(filename: str):
-    return f'file {filename} is going to be partially updated'
+def partial_file_update(slug: str):
+    return f'file {slug} is going to be partially updated'
