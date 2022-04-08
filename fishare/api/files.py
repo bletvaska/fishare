@@ -1,4 +1,5 @@
 import shutil
+from datetime import datetime
 from typing import Optional
 
 import fastapi
@@ -21,6 +22,8 @@ settings = Settings()
 # TODO
 # 1. PUT
 # 2. PATCH
+# 3. JsonProblemResponse
+# 4. cron
 
 
 @router.get("/files/", summary="Get list of files.")
@@ -169,15 +172,51 @@ def delete_file(slug: str, session: Session = Depends(get_session)):
             summary='Updates the file identified by {slug}. Any parameters not provided are reset to defaults.')
 def full_file_update(slug: str,
                      payload: Optional[UploadFile] = fastapi.File(...),
-                     filename: str = Form(...),
+                     filename: str = Form(None),
                      max_downloads: int = Form(...),
                      session: Session = Depends(get_session)
                      ):
-    # updated_at - bude treba aktualizovat
-    # mime_type na zaklade suboru aktualizovaneho
+    try:
+        # get the file with given slug
+        statement = select(File).where(File.slug == slug)
+        file = session.exec(statement).one()
 
-    # vo vysledk by mal vratit cely objekt aktualizovany (FileOut)
-    return f'file {slug} is going to be fully updated'
+        # save uploaded file
+        path = settings.storage / file.slug
+        with open(path, 'wb') as dest:
+            shutil.copyfileobj(payload.file, dest)
+
+        # update filename if given
+        if filename is not None:
+            file.filename = filename
+        else:
+            file.filename = payload.filename
+
+        # update other file fields
+        file.size = path.stat().st_size
+        file.max_downloads = max_downloads
+        file.updated_at = datetime.now()
+        file.mime_type = payload.content_type
+
+        # update db
+        session.add(file)
+        session.commit()
+        session.refresh(file)
+
+        return file
+
+    except NoResultFound as ex:
+        # when not found, then 404
+        content = ProblemDetails(
+            type='/errors/files/put',
+            title="File not found.",
+            status=404,
+            detail=f"File with slug '{slug}' was not found.",
+            instance=f"/files/{slug}"
+        )
+
+    return JSONResponse(status_code=content.status,
+                        content=content.dict())
 
 
 @router.patch('/files/{filename}',
