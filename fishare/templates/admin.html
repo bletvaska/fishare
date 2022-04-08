@@ -19,7 +19,9 @@
     {% for file in files %}
     <tr>
         <td>{{ file.slug }}</td>
-        <td>{{ file.filename }}</td>
+        <td>
+            <a href="{{ base_url }}/{{ file.slug }}">{{ file.filename }}</a>
+        </td>
         <td>{{ file.size }}</td>
         <td>{{ file.downloads }}/{{ file.max_downloads }}</td>
         <td>{{ file.mime_type }}</td>
