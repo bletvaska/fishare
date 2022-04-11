@@ -4,12 +4,12 @@ from functools import wraps
 from typing import Optional
 
 import fastapi
-from fastapi import Depends, Form, UploadFile, Request
-from sqlalchemy import update
+from fastapi import Depends, Form, UploadFile
 from sqlalchemy.exc import NoResultFound
 from sqlmodel import Session, select
 from starlette.responses import JSONResponse
 
+from fishare.core.responses import ProblemJSONResponse
 from fishare.database import get_session
 from fishare.models.file import FileOut, File
 from fishare.models.pager import Pager
@@ -26,7 +26,6 @@ settings = Settings()
 # 3. JsonProblemResponse
 # 4. dekorator (file exists)
 # 5. dependency injection na settings
-# 6. testing intro
 # 7. balenie obrazov do docker-u
 # 8. requests na kradnutie pocasia
 
@@ -78,9 +77,9 @@ def get_list_of_files(offset: int = 0, page_size: int = 5, session: Session = De
             instance=f"/files/?page_size={page_size}&offset={offset}"
         )
 
-    return JSONResponse(
+    return ProblemJSONResponse(
         status_code=content.status,
-        content=content.dict(exclude_unset=True)
+        content=content.dict(exclude_unset=True),
     )
 
 
@@ -103,7 +102,7 @@ def get_file(func):
                 instance=f"/files/{slug}"
             )
 
-            return JSONResponse(
+            return ProblemJSONResponse(
                 status_code=content.status,
                 content=content.dict(exclude_unset=True)
             )
@@ -198,8 +197,8 @@ def delete_file(slug: str, session: Session = Depends(get_session)):
             instance=f"/files/{slug}"
         )
 
-    return JSONResponse(status_code=content.status,
-                        content=content.dict())
+    return ProblemJSONResponse(status_code=content.status,
+                               content=content.dict())
 
 
 @router.put('/{slug}', response_model=FileOut,
@@ -249,8 +248,10 @@ def full_file_update(slug: str,
             instance=f"/files/{slug}"
         )
 
-    return JSONResponse(status_code=content.status,
-                        content=content.dict())
+    return ProblemJSONResponse(
+        status_code=content.status,
+        content=content.dict()
+    )
 
 
 @router.patch('/{slug}', response_model=FileOut,
@@ -304,4 +305,7 @@ def update_file(slug: str,
             instance=f"/files/{slug}"
         )
 
-        return JSONResponse(status_code=404, content=content.dict())
+        return ProblemJSONResponse(
+            status_code=404,
+            content=content.dict()
+        )
