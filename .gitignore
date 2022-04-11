@@ -108,3 +108,4 @@ poetry.lock
 reports/
 
 data/
+report.html
