@@ -1,13 +1,13 @@
 import shutil
 from datetime import datetime, timedelta
-from functools import wraps
 from typing import Optional
 
 import fastapi
-from fastapi import Depends, Form, UploadFile
+from fastapi import Depends, Form, UploadFile, Response
 from sqlalchemy.exc import NoResultFound
 from sqlmodel import Session, select
 
+from fishare.core.decorators import file_exists
 from fishare.core.responses import ProblemJSONResponse
 from fishare.database import get_session
 from fishare.models.file import FileOut, File
@@ -21,7 +21,6 @@ router = fastapi.APIRouter()
 # TODO
 # 1. Zostavenie instalacneho balicku
 # 4. dekorator (file exists)
-# 5. dependency injection na settings
 # 7. balenie obrazov do docker-u
 # 8. requests na kradnutie pocasia
 
@@ -79,55 +78,10 @@ def get_list_of_files(offset: int = 0, page_size: int = 5, session: Session = De
     )
 
 
-def get_file(func):
-    @wraps(func)
-    def wrapper(slug: str, session: Session = Depends(get_session), **kwargs):
-        try:
-            # get the file
-            statement = select(File).where(File.slug == slug)
-            file = session.exec(statement).one()
-
-            # return func
-            return func(slug, file, session)
-        except NoResultFound as ex:
-            content = ProblemDetails(
-                type='/errors/files/get',
-                title="File not found.",
-                status=404,
-                detail=f"File with slug '{slug}' was not found.'",
-                instance=f"/files/{slug}"
-            )
-
-            return ProblemJSONResponse(
-                status_code=content.status,
-                content=content.dict(exclude_unset=True)
-            )
-
-    return wrapper
-
-
 @router.get('/{slug}', response_model=FileOut, summary="Get file identified by the {slug}.")
-@get_file
+@file_exists
 def get_file(slug: str, file=None, session: Session = Depends(get_session)):
     return file
-    # print(slug, file, session)
-    # try:
-    #     statement = select(File).where(File.slug == slug)
-    #     return session.exec(statement).one()
-    #
-    # except NoResultFound as ex:
-    #     content = ProblemDetails(
-    #         type='/errors/files/get',
-    #         title="File not found.",
-    #         status=404,
-    #         detail=f"File with slug '{slug}' was not found.'",
-    #         instance=f"/files/{slug}"
-    #     )
-    #
-    # return JSONResponse(
-    #     status_code=content.status,
-    #     content=content.dict(exclude_unset=True)
-    # )
 
 
 @router.post('/', response_model=FileOut, status_code=201,
@@ -163,42 +117,22 @@ def create_file(payload: UploadFile = fastapi.File(...),
 
 @router.delete('/{slug}', status_code=204,
                summary='Deletes the file identified by {slug}.')
-def delete_file(slug: str, session: Session = Depends(get_session)):
-    try:
-        # session.query(File).filter(File.slug == slug).delete()
+@file_exists
+def delete_file(slug: str, file=None, session: Session = Depends(get_session)):
+    # delete file from storage
+    path = settings.storage / file.slug
+    path.unlink(missing_ok=True)
 
-        # select file by slug
-        statement = select(File).where(File.slug == slug)
-        file = session.exec(statement).one()
+    # delete file
+    session.delete(file)
+    session.commit()
 
-        # delete file from storage
-        path = settings.storage / file.slug
-        path.unlink(missing_ok=True)
-
-        # delete file
-        session.delete(file)
-        session.commit()
-
-        # return 204
-        # return Response(status_code=204)
-        return  # return None
-
-    except NoResultFound as ex:
-        # when not found, then 404
-        content = ProblemDetails(
-            type='/errors/files/delete',
-            title="File not found.",
-            status=404,
-            detail=f"File with slug '{slug}' was not found.",
-            instance=f"/files/{slug}"
-        )
-
-    return ProblemJSONResponse(status_code=content.status,
-                               content=content.dict())
+    return Response(status_code=204)
 
 
 @router.put('/{slug}', response_model=FileOut,
             summary='Updates the file identified by {slug}. Any parameters not provided are reset to defaults.')
+@file_exists
 def full_file_update(slug: str,
                      payload: UploadFile,  # UploadFile = fastapi.File(...)
                      filename: str = Form(None),
