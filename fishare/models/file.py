@@ -5,9 +5,7 @@ from typing import Optional
 from pydantic import BaseModel, validator, HttpUrl
 from sqlmodel import SQLModel, Field
 
-from fishare.models.settings import Settings
-
-settings = Settings()
+from fishare.models.settings import settings
 
 
 class File(SQLModel, table=True):

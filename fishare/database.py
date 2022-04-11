@@ -1,8 +1,7 @@
 from sqlmodel import Session, create_engine
 
-from fishare.models.settings import Settings
+from fishare.models.settings import settings
 
-settings = Settings()
 engine = create_engine(settings.db_uri)
 
 

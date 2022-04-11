@@ -7,10 +7,9 @@ from sqlmodel import Session, select
 
 from fishare.database import get_session
 from fishare.models.file import File
-from fishare.models.settings import Settings
+from fishare.models.settings import settings
 
 router = fastapi.APIRouter()
-settings = Settings()
 
 
 @router.get("/", summary="Run background jobs.")

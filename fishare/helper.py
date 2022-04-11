@@ -4,9 +4,7 @@ from faker import Faker
 from sqlmodel import create_engine, Session
 
 from fishare.models.file import File
-from fishare.models.settings import Settings
-
-settings = Settings()
+from fishare.models.settings import settings
 
 
 def populate_data(count: int = 10):

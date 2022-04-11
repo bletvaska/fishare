@@ -7,23 +7,19 @@ import fastapi
 from fastapi import Depends, Form, UploadFile
 from sqlalchemy.exc import NoResultFound
 from sqlmodel import Session, select
-from starlette.responses import JSONResponse
 
 from fishare.core.responses import ProblemJSONResponse
 from fishare.database import get_session
 from fishare.models.file import FileOut, File
 from fishare.models.pager import Pager
 from fishare.models.problem_details import ProblemDetails
-from fishare.models.settings import Settings
+from fishare.models.settings import settings
 
 router = fastapi.APIRouter()
-
-settings = Settings()
 
 
 # TODO
 # 1. Zostavenie instalacneho balicku
-# 3. JsonProblemResponse
 # 4. dekorator (file exists)
 # 5. dependency injection na settings
 # 7. balenie obrazov do docker-u

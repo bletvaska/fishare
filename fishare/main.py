@@ -7,7 +7,7 @@ from starlette.staticfiles import StaticFiles
 
 from fishare.views import homepage, admin
 from fishare.api import files, cron, download
-from fishare.models.settings import Settings
+from fishare.models.settings import settings
 
 app = FastAPI(title='Fishare')
 
@@ -27,7 +27,6 @@ app.mount('/static',
 
 def main():
     # TODO fix if storage directory does not exist
-    settings = Settings()
 
     # init db
     engine = create_engine(settings.db_uri)
