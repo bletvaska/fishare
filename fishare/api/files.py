@@ -19,8 +19,6 @@ router = fastapi.APIRouter()
 
 
 # TODO
-# 1. Zostavenie instalacneho balicku
-# 4. dekorator (file exists)
 # 7. balenie obrazov do docker-u
 # 8. requests na kradnutie pocasia
 
