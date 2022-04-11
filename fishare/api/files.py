@@ -19,7 +19,6 @@ router = fastapi.APIRouter()
 
 
 # TODO
-# 7. balenie obrazov do docker-u
 # 8. requests na kradnutie pocasia
 
 

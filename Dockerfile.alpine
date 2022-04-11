@@ -1,3 +1,6 @@
+# UPOZORNENIE!!!
+# nebal svoje python aplikacie do kontajnerov zalozenych na alpine linuxe!!!!!
+
 FROM alpine AS builder
 LABEL mainter="mirek <mirek@cnl.sk>"
 
