@@ -1,9 +1,11 @@
 import shutil
-from datetime import datetime
+from datetime import datetime, timedelta
+from functools import wraps
 from typing import Optional
 
 import fastapi
-from fastapi import Depends, Form, UploadFile
+from fastapi import Depends, Form, UploadFile, Request
+from sqlalchemy import update
 from sqlalchemy.exc import NoResultFound
 from sqlmodel import Session, select
 from starlette.responses import JSONResponse
@@ -20,9 +22,13 @@ settings = Settings()
 
 
 # TODO
-# 2. PATCH
+# 1. Zostavenie instalacneho balicku
 # 3. JsonProblemResponse
-# 4. cron
+# 4. dekorator (file exists)
+# 5. dependency injection na settings
+# 6. testing intro
+# 7. balenie obrazov do docker-u
+# 8. requests na kradnutie pocasia
 
 
 @router.get("/", summary="Get list of files.")
@@ -78,26 +84,55 @@ def get_list_of_files(offset: int = 0, page_size: int = 5, session: Session = De
     )
 
 
-@router.head('/{slug}')
+def get_file(func):
+    @wraps(func)
+    def wrapper(slug: str, session: Session = Depends(get_session), **kwargs):
+        try:
+            # get the file
+            statement = select(File).where(File.slug == slug)
+            file = session.exec(statement).one()
+
+            # return func
+            return func(slug, file, session)
+        except NoResultFound as ex:
+            content = ProblemDetails(
+                type='/errors/files/get',
+                title="File not found.",
+                status=404,
+                detail=f"File with slug '{slug}' was not found.'",
+                instance=f"/files/{slug}"
+            )
+
+            return JSONResponse(
+                status_code=content.status,
+                content=content.dict(exclude_unset=True)
+            )
+
+    return wrapper
+
+
 @router.get('/{slug}', response_model=FileOut, summary="Get file identified by the {slug}.")
-def get_file(slug: str, session: Session = Depends(get_session)):
-    try:
-        statement = select(File).where(File.slug == slug)
-        return session.exec(statement).one()
-
-    except NoResultFound as ex:
-        content = ProblemDetails(
-            type='/errors/files/get',
-            title="File not found.",
-            status=404,
-            detail=f"File with slug '{slug}' was not found.'",
-            instance=f"/files/{slug}"
-        )
-
-    return JSONResponse(
-        status_code=content.status,
-        content=content.dict(exclude_unset=True)
-    )
+@get_file
+def get_file(slug: str, file=None, session: Session = Depends(get_session)):
+    return file
+    # print(slug, file, session)
+    # try:
+    #     statement = select(File).where(File.slug == slug)
+    #     return session.exec(statement).one()
+    #
+    # except NoResultFound as ex:
+    #     content = ProblemDetails(
+    #         type='/errors/files/get',
+    #         title="File not found.",
+    #         status=404,
+    #         detail=f"File with slug '{slug}' was not found.'",
+    #         instance=f"/files/{slug}"
+    #     )
+    #
+    # return JSONResponse(
+    #     status_code=content.status,
+    #     content=content.dict(exclude_unset=True)
+    # )
 
 
 @router.post('/', response_model=FileOut, status_code=201,
@@ -218,8 +253,55 @@ def full_file_update(slug: str,
                         content=content.dict())
 
 
-@router.patch('/{slug}',
+@router.patch('/{slug}', response_model=FileOut,
               summary='Updates the file identified by {slug}. For any parameters not provided in request, existing '
                       'values are retained.')
-def partial_file_update(slug: str):
-    return f'file {slug} is going to be partially updated'
+def update_file(slug: str,
+                payload: Optional[UploadFile] = fastapi.File(None),
+                filename: str = Form(None),
+                max_downloads: int = Form(None),
+                session: Session = Depends(get_session)):
+    try:
+        # get file from db
+        statement = select(File).where(File.slug == slug)
+        file = session.exec(statement).one()
+
+        # if file was uploaded
+        if payload is not None:
+            # update filename and mimetype
+            file.filename = payload.filename if filename is None else filename
+            file.mime_type = payload.content_type
+
+            # upload file
+            path = settings.storage / file.slug
+            with open(path, 'wb') as dest:
+                shutil.copyfileobj(payload.file, dest)
+
+            # update file size
+            file.size = path.stat().st_size
+
+        else:
+            file.filename = file.filename if filename is None else filename
+
+        # update max_download and updated time
+        file.max_downloads = file.max_downloads if max_downloads is None else max_downloads
+        file.updated_at = datetime.now()
+        file.expires = datetime.now() + timedelta(days=1)
+
+        # update
+        session.add(file)
+        session.commit()
+        session.refresh(file)
+
+        return file
+
+    except NoResultFound as ex:
+        content = ProblemDetails(
+            type='/errors/files/patch',
+            title="File not found.",
+            status=404,
+            detail=f"File with slug '{slug}' was not found.'",
+            instance=f"/files/{slug}"
+        )
+
+        return JSONResponse(status_code=404, content=content.dict())

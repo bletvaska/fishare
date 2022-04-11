@@ -9,7 +9,7 @@ from fishare.views import homepage, admin
 from fishare.api import files, cron, download
 from fishare.models.settings import Settings
 
-app = FastAPI()
+app = FastAPI(title='Fishare')
 
 # rest api
 app.include_router(files.router, prefix='/api/v1/files')
