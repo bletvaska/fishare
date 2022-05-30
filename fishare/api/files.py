@@ -13,7 +13,7 @@ from fishare.database import get_session
 from fishare.models.file import FileOut, File
 from fishare.models.pager import Pager
 from fishare.models.problem_details import ProblemDetails
-from fishare.models.settings import settings
+from fishare.models.settings import get_settings
 
 router = fastapi.APIRouter()
 
@@ -27,6 +27,7 @@ def get_list_of_files(offset: int = 0, page_size: int = 5, session: Session = De
     """
     Returns the Pager, which contains the list of files.
     """
+    settings = get_settings()
 
     try:
         # count nr of files
@@ -95,7 +96,7 @@ def create_file(payload: UploadFile = fastapi.File(...),
     )
 
     # get ready
-    path = settings.storage / file.slug
+    path = get_settings().storage / file.slug
 
     # save uploaded file
     with open(path, 'wb') as dest:
@@ -117,7 +118,7 @@ def create_file(payload: UploadFile = fastapi.File(...),
 @file_exists
 def delete_file(slug: str, file=None, session: Session = Depends(get_session)):
     # delete file from storage
-    path = settings.storage / file.slug
+    path = get_settings().storage / file.slug
     path.unlink(missing_ok=True)
 
     # delete file
@@ -142,7 +143,7 @@ def full_file_update(slug: str,
         file = session.exec(statement).one()
 
         # save uploaded file
-        path = settings.storage / file.slug
+        path = get_settings().storage / file.slug
         with open(path, 'wb') as dest:
             shutil.copyfileobj(payload.file, dest)
 
@@ -201,7 +202,7 @@ def update_file(slug: str,
             file.mime_type = payload.content_type
 
             # upload file
-            path = settings.storage / file.slug
+            path = get_settings().storage / file.slug
             with open(path, 'wb') as dest:
                 shutil.copyfileobj(payload.file, dest)
 

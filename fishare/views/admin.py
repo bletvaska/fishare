@@ -4,7 +4,7 @@ from sqlmodel import Session, select
 
 from fishare.database import get_session
 from fishare.models.file import File
-from fishare.models.settings import settings
+from fishare.models.settings import get_settings
 
 router = APIRouter()
 templates = Jinja2Templates(directory='fishare/templates/')
@@ -21,7 +21,7 @@ def list_of_files(request: Request, session: Session = Depends(get_session)):
         'request': request,
         'title': 'fishare Admin',
         'files': files,
-        'base_url': settings.base_url
+        'base_url': get_settings().base_url
     }
 
     # render

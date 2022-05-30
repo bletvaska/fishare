@@ -5,7 +5,7 @@ from typing import Optional
 from pydantic import BaseModel, validator, HttpUrl
 from sqlmodel import SQLModel, Field
 
-from fishare.models.settings import settings
+from fishare.models.settings import get_settings
 
 
 class File(SQLModel, table=True):
@@ -31,7 +31,7 @@ class File(SQLModel, table=True):
 
     @validator('slug', always=True)
     def set_secret_slug(cls, value):
-        return secrets.token_urlsafe(settings.slug_length)
+        return secrets.token_urlsafe(get_settings().slug_length)
 
 
 class FileOut(BaseModel):
@@ -45,4 +45,4 @@ class FileOut(BaseModel):
 
     @validator('url', always=True)
     def set_file_url(cls, value, values):
-        return f'{settings.base_url}/{values["slug"]}'
+        return f'{get_settings().base_url}/{values["slug"]}'

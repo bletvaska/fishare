@@ -7,7 +7,7 @@ from starlette.responses import JSONResponse, FileResponse
 from fishare.database import get_session
 from fishare.models.file import File
 from fishare.models.problem_details import ProblemDetails
-from fishare.models.settings import settings
+from fishare.models.settings import get_settings
 
 router = fastapi.APIRouter()
 
@@ -30,7 +30,7 @@ def download_file(slug: str, session: Session = Depends(get_session)):
         session.refresh(file)
 
         return FileResponse(
-            settings.storage / file.slug,  # path
+            get_settings().storage / file.slug,  # path
             media_type=file.mime_type,     # content-type
             filename=file.filename         # filename
         )

@@ -7,7 +7,7 @@ from sqlmodel import Session, select
 
 from fishare.database import get_session
 from fishare.models.file import File
-from fishare.models.settings import settings
+from fishare.models.settings import get_settings
 
 router = fastapi.APIRouter()
 
@@ -23,7 +23,7 @@ def run_cron_job(session: Session = Depends(get_session)):
     # delete files
     for file in files:
         # prepare path
-        path = settings.storage / file.slug
+        path = get_settings().storage / file.slug
 
         # delete file
         session.delete(file)
