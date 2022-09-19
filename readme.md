@@ -23,4 +23,3 @@ Znalosť jazyka Python na tomto školení je nutná.
 * zbieranie metrík
 * balenie Python aplikácií do Docker obrazov
 
-
