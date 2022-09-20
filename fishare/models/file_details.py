@@ -16,7 +16,13 @@ class FileDetails(BaseModel):
 
     @validator('mime_type')
     def mime_type_must_contain_slash(cls, v):
+        # print('>> validating mime_type')
         if '/' not in v:
             raise ValueError('must contain "/"')
         else:
             return v.lower()
+
+    @validator('created_at', always=True)
+    def set_created_time(cls, v):
+        # print('>> validating created_at')
+        return datetime.now()
