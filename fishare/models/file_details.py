@@ -3,6 +3,8 @@ from datetime import datetime
 
 from pydantic import BaseModel, validator
 
+from fishare.models.settings import get_settings
+
 
 class FileDetails(BaseModel):
     # id: int
@@ -30,4 +32,4 @@ class FileDetails(BaseModel):
 
     @validator('slug', always=True)
     def set_secret_slug(cls, v):
-        return secrets.token_urlsafe(5)
+        return secrets.token_urlsafe(get_settings().slug_length)
