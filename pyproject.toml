@@ -8,6 +8,7 @@ authors = ["Miroslav Biňas <miroslav.binas@tuke.sk>"]
 python = "^3.10"
 fastapi = "^0.85.0"
 uvicorn = "^0.18.3"
+pydantic = "^1.10.2"
 
 [tool.poetry.dev-dependencies]
 ipython = "^8.5.0"

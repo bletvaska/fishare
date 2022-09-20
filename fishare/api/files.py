@@ -16,6 +16,9 @@ def get_list_of_files():
 # SELECT * FROM files WHERE slug=slug
 @router.get('/{slug}', summary='Get file details identified by the {slug}.')
 def get_file_detail(slug: str):
+    """
+    Returns file details.
+    """
     return {
         'filename': 'file4',
         'slug': slug
