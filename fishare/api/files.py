@@ -1,12 +1,13 @@
 import fastapi
 
 from fishare.models.file_details import FileDetails
+from fishare.models.file_details_out import FileDetailsOut
 
 router = fastapi.APIRouter()
 
 
 # SELECT * FROM files
-@router.get('/', summary='Get list of files.')
+@router.get('/', summary='Get list of files.', response_model=list[FileDetailsOut])
 def get_list_of_files():
     return [
         FileDetails(filename='fishare.exe', size=1024, mime_type='application/exec'),

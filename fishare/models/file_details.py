@@ -1,3 +1,4 @@
+import secrets
 from datetime import datetime
 
 from pydantic import BaseModel, validator
@@ -26,3 +27,7 @@ class FileDetails(BaseModel):
     def set_created_time(cls, v):
         # print('>> validating created_at')
         return datetime.now()
+
+    @validator('slug', always=True)
+    def set_secret_slug(cls, v):
+        return secrets.token_urlsafe(5)

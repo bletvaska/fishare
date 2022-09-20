@@ -14,6 +14,6 @@ class FileDetailsOut(BaseModel):
 
     @validator('url', always=True)
     def set_file_details_url(cls, value, values):
-        print('>> validating url')
-        print(values)
-        return f'http://localhost:8000/'
+        # print('>> validating url')
+        # print(values)
+        return f'http://localhost:8000/{values["slug"]}'
