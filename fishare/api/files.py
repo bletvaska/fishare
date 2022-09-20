@@ -1,5 +1,7 @@
 import fastapi
+from sqlalchemy.exc import NoResultFound
 from sqlmodel import create_engine, Session, select
+from starlette.responses import JSONResponse
 
 from fishare.models.file_details import FileDetails
 from fishare.models.file_details_out import FileDetailsOut
@@ -28,11 +30,20 @@ def get_file_detail(slug: str):
     """
     engine = create_engine(get_settings().db_uri)
 
-    with Session(engine) as session:
-        # SELECT * FROM files WHERE slug=slug
-        statement = select(FileDetails).where(FileDetails.slug == slug)
-        file = session.exec(statement).one()
-        return file
+    try:
+        with Session(engine) as session:
+            # SELECT * FROM files WHERE slug=slug
+            statement = select(FileDetails).where(FileDetails.slug == slug)
+            file = session.exec(statement).one()
+            return file
+    except NoResultFound as ex:
+        return JSONResponse(
+            status_code=404,
+            content={
+                'error': 'not found'
+            }
+        )
+
 
 
 # DELETE FROM files WHERE slug=slug
