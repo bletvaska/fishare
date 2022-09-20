@@ -1,13 +1,15 @@
 import secrets
 from datetime import datetime
+from typing import Optional
 
-from pydantic import BaseModel, validator
+from pydantic import validator
+from sqlmodel import SQLModel, Field
 
 from fishare.models.settings import get_settings
 
 
-class FileDetails(BaseModel):
-    # id: int
+class FileDetails(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
     slug: str | None = None
     filename: str
     downloads = 0
