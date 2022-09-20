@@ -1,30 +1,38 @@
 import fastapi
+from sqlmodel import create_engine, Session, select
 
 from fishare.models.file_details import FileDetails
 from fishare.models.file_details_out import FileDetailsOut
+from fishare.models.settings import get_settings
 
 router = fastapi.APIRouter()
 
 
-# SELECT * FROM files
+
 @router.get('/', summary='Get list of files.') # , response_model=list[FileDetailsOut])
 def get_list_of_files():
-    file = FileDetails(filename='fishare.exe', size=1024, mime_type='application/exec')
-    return [
-        FileDetails(filename='fishare.exe', size=1024, mime_type='application/exec'),
-        FileDetails(filename='main.py', size=2048, mime_type='text/PYTHON'),
-        FileDetails(filename='jano.jpg', size=65535, mime_type='image/jpeg'),
-        FileDetailsOut(**file.dict())
-    ]
+    engine = create_engine(get_settings().db_uri)
+
+    with Session(engine) as session:
+        # SELECT * FROM files
+        statement = select(FileDetails)
+        files = session.exec(statement).all()
+        return files
+        # session.close()
 
 
-# SELECT * FROM files WHERE slug=slug
 @router.get('/{slug}', summary='Get file details identified by the {slug}.', response_model=FileDetailsOut)
 def get_file_detail(slug: str):
     """
     Returns file details.
     """
-    return FileDetails(filename='jano.jpg', size=65535, mime_type='image/jpeg')
+    engine = create_engine(get_settings().db_uri)
+
+    with Session(engine) as session:
+        # SELECT * FROM files WHERE slug=slug
+        statement = select(FileDetails).where(FileDetails.slug == slug)
+        file = session.exec(statement).one()
+        return file
 
 
 # DELETE FROM files WHERE slug=slug
