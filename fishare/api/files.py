@@ -7,25 +7,24 @@ router = fastapi.APIRouter()
 
 
 # SELECT * FROM files
-@router.get('/', summary='Get list of files.', response_model=list[FileDetailsOut])
+@router.get('/', summary='Get list of files.') # , response_model=list[FileDetailsOut])
 def get_list_of_files():
+    file = FileDetails(filename='fishare.exe', size=1024, mime_type='application/exec')
     return [
         FileDetails(filename='fishare.exe', size=1024, mime_type='application/exec'),
         FileDetails(filename='main.py', size=2048, mime_type='text/PYTHON'),
-        FileDetails(filename='jano.jpg', size=65535, mime_type='image/jpeg')
+        FileDetails(filename='jano.jpg', size=65535, mime_type='image/jpeg'),
+        FileDetailsOut(**file.dict())
     ]
 
 
 # SELECT * FROM files WHERE slug=slug
-@router.get('/{slug}', summary='Get file details identified by the {slug}.')
+@router.get('/{slug}', summary='Get file details identified by the {slug}.', response_model=FileDetailsOut)
 def get_file_detail(slug: str):
     """
     Returns file details.
     """
-    return {
-        'filename': 'file4',
-        'slug': slug
-    }
+    return FileDetails(filename='jano.jpg', size=65535, mime_type='image/jpeg')
 
 
 # DELETE FROM files WHERE slug=slug
