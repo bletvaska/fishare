@@ -8,6 +8,7 @@ class Settings(BaseSettings):
     port = 8000
     slug_length = 5
     environment = 'development'
+    db_uri = 'sqlite:///database.db'
 
     class Config:
         env_file = '.env'
