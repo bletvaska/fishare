@@ -11,8 +11,7 @@ from fishare.models.settings import get_settings
 router = fastapi.APIRouter()
 
 
-
-@router.get('/', summary='Get list of files.') # , response_model=list[FileDetailsOut])
+@router.get('/', summary='Get list of files.', response_model=list[FileDetailsOut])
 def get_list_of_files():
     engine = create_engine(get_settings().db_uri)
 
@@ -21,7 +20,6 @@ def get_list_of_files():
         statement = select(FileDetails)
         files = session.exec(statement).all()
         return files
-        # session.close()
 
 
 @router.get('/{slug}', summary='Get file details identified by the {slug}.', response_model=FileDetailsOut)
@@ -38,7 +36,7 @@ def get_file_detail(slug: str):
             file = session.exec(statement).one()
             return file
     except NoResultFound as ex:
-        content = ProblemDetails(
+        problem = ProblemDetails(
             status=404,
             title='File not found',
             detail=f"File with slug '{slug}' does not exist.",
@@ -46,10 +44,12 @@ def get_file_detail(slug: str):
         )
 
         return JSONResponse(
-            status_code=content.status,
-            content=content.dict()
+            status_code=problem.status,
+            content=problem.dict(),
+            media_type='application/problem+json'
         )
 
+        # return ProblemDetailsResponse(problem)
 
 
 # DELETE FROM files WHERE slug=slug
