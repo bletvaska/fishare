@@ -1,5 +1,7 @@
 from pydantic import BaseModel, validator, HttpUrl
 
+from fishare.models.settings import Settings, get_settings
+
 
 class FileDetailsOut(BaseModel):
     slug: str
@@ -14,4 +16,4 @@ class FileDetailsOut(BaseModel):
     def set_file_details_url(cls, value, values):
         # print('>> validating url')
         # print(values)
-        return f'http://localhost:8000/{values["slug"]}'
+        return f'{get_settings().base_url}/{values["slug"]}'
