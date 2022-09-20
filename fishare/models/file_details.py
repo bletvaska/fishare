@@ -9,8 +9,8 @@ from fishare.models.settings import get_settings
 
 
 class FileDetails(SQLModel, table=True):
-    id: Optional[int] = Field(default=None, primary_key=True)
-    # id: int | None = Field(default=None, primary_key=True)
+    # id: Optional[int] = Field(default=None, primary_key=True)
+    id: int | None = Field(default=None, primary_key=True)
     slug: str | None = None
     filename: str
     downloads = 0

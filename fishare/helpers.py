@@ -24,3 +24,7 @@ def populate_data(count: int = 100):
             session.add(file)
 
         session.commit()
+
+
+if __name__ == '__main__':
+    populate_data()

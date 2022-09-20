@@ -24,6 +24,5 @@ if __name__ == '__main__':
     # init database
     # engine = create_engine(get_settings().db_uri)
     # SQLModel.metadata.create_all(engine)
-    populate_data()
 
-    # uvicorn.run('fishare.main:app', reload=True, port=get_settings().port, host='127.0.0.1')
+    uvicorn.run('fishare.main:app', reload=True, port=get_settings().port, host='127.0.0.1')
