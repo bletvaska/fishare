@@ -22,7 +22,9 @@ def download_file(request: Request, slug: str,
     try:
         # get file by slug
         # SELECT * FROM filedetails WHERE slug={slug} AND downloads < max_downloads
-        statement = select(FileDetails).where(FileDetails.slug == slug).where(FileDetails.downloads < FileDetails.max_downloads)
+        statement = select(FileDetails) \
+            .where(FileDetails.slug == slug) \
+            .where(FileDetails.downloads < FileDetails.max_downloads)
         file = session.exec(statement).one()
 
         # update the number of downloads
