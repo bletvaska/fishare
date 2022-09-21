@@ -153,10 +153,53 @@ def full_update_file(request: Request, slug: str,
 
 # UPDATE files WHERE slug=slug SET ....
 # partial update
-@router.patch('/{slug}', summary='Updates the file identified by the {slug}. For any parameters not provided in '
-                                 'request, existing values are retained.')
-def partial_update_file(slug: str):
-    return f'partial update for file {slug}'
+@router.patch('/{slug}', status_code=200, response_model=FileDetailsOut,
+              summary='Updates the file identified by the {slug}. For any parameters not provided in '
+                      'request, existing values are retained.')
+def partial_update_file(request: Request, slug: str,
+                        filename: str | None = Form(None),
+                        max_downloads: int = Form(None),
+                        payload: None | UploadFile = File(...),
+                        session: Session = Depends(get_session),
+                        settings: Settings = Depends(get_settings)
+                        ):
+    try:
+        # select file with given slug
+        statement = select(FileDetails).where(FileDetails.slug == slug)
+        file = session.exec(statement).one()
+
+        # create path for file to save
+        path = settings.storage / file.slug
+
+        # save file
+        with open(path, 'wb') as dest:
+            shutil.copyfileobj(payload.file, dest)
+
+        # update file fields
+        file.size = path.stat().st_size
+        file.filename = payload.filename
+        file.max_downloads = max_downloads
+        file.updated_at = datetime.now()
+
+        # update db
+        session.add(file)
+        session.commit()
+        session.refresh(file)
+
+        return file
+    except NoResultFound as ex:
+        problem = ProblemDetails(
+            status=404,
+            title='File not found',
+            detail=f"File with slug '{slug}' does not exist.",
+            instance=f'{request.url.path}'
+        )
+
+        return JSONResponse(
+            status_code=problem.status,
+            content=problem.dict(),
+            media_type='application/problem+json'
+        )
 
 
 # INSERT INTO files VALUES(...)
