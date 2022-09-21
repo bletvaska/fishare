@@ -36,9 +36,9 @@ def download_file(request: Request, slug: str,
 
         # return file
         return FileResponse(
-            settings.storage / file.slug,   # path
-            media_type=file.mime_type,      # content-type
-            filename=file.filename          # filename
+            settings.storage / file.slug,  # path
+            media_type=file.mime_type,  # content-type
+            filename=file.filename  # filename
         )
 
     except NoResultFound as ex:
