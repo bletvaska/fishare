@@ -157,9 +157,9 @@ def full_update_file(request: Request, slug: str,
               summary='Updates the file identified by the {slug}. For any parameters not provided in '
                       'request, existing values are retained.')
 def partial_update_file(request: Request, slug: str,
-                        filename: str | None = Form(None),
+                        filename: str = Form(None),
                         max_downloads: int = Form(None),
-                        payload: None | UploadFile = File(...),
+                        payload: UploadFile = File(None),
                         session: Session = Depends(get_session),
                         settings: Settings = Depends(get_settings)
                         ):
@@ -168,17 +168,28 @@ def partial_update_file(request: Request, slug: str,
         statement = select(FileDetails).where(FileDetails.slug == slug)
         file = session.exec(statement).one()
 
-        # create path for file to save
-        path = settings.storage / file.slug
+        # update filename
+        if filename is not None:
+            file.filename = filename
 
-        # save file
-        with open(path, 'wb') as dest:
-            shutil.copyfileobj(payload.file, dest)
+        # update max_downloads
+        if max_downloads is not None:
+            file.max_downloads = max_downloads
 
-        # update file fields
-        file.size = path.stat().st_size
-        file.filename = payload.filename
-        file.max_downloads = max_downloads
+        # update payload
+        if payload is not None:
+            # create path for file to save
+            path = settings.storage / file.slug
+
+            # save file
+            with open(path, 'wb') as dest:
+                shutil.copyfileobj(payload.file, dest)
+
+            # update file fields
+            file.size = path.stat().st_size
+            file.mime_type = mimetypes.guess_type(payload.filename)[0]
+
+        # update always
         file.updated_at = datetime.now()
 
         # update db
