@@ -1,3 +1,5 @@
+import shutil
+
 import fastapi
 from fastapi import Depends, Form, UploadFile, File
 from sqlalchemy.exc import NoResultFound
@@ -116,9 +118,26 @@ def partial_update_file(slug: str):
 
 
 # INSERT INTO files VALUES(...)
-@router.post('/', summary='Uploads a file and creates file details.', status_code=201)
-def create_file(max_downloads: str | None = Form(None),
+@router.post('/', status_code=201, response_model=FileDetailsOut,
+             summary='Uploads a file and creates file details.')
+def create_file(max_downloads: int | None = Form(None),
                 payload: UploadFile = File(...),
                 session: Session = Depends(get_session)):
-    print(payload)
-    return max_downloads
+    # print(payload)
+    # print(max_downloads)
+
+    file = FileDetails(
+        max_downloads=max_downloads,
+        filename=payload.filename,
+        mime_type=payload.content_type,
+        size=-1
+    )
+
+    # create path for file to save
+    path = get_settings().storage / file.slug
+
+    # save file
+    with open(path, 'wb') as dest:
+        shutil.copyfileobj(payload.file, dest)
+
+    return file

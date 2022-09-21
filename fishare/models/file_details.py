@@ -28,6 +28,17 @@ class FileDetails(SQLModel, table=True):
         else:
             return v.lower()
 
+    @validator('max_downloads')
+    def must_be_positive_number(cls, v):
+        # print('>> validating max_downloads')
+        # print(v)
+        if v < 1:
+            # print('>> raising')
+            raise ValueError('must be positive number greater than 0')
+        else:
+            return v
+
+
     @validator('created_at', always=True)
     def set_created_time(cls, v):
         # print('>> validating created_at')

@@ -1,6 +1,6 @@
 from functools import lru_cache
 
-from pydantic import BaseSettings, AnyHttpUrl
+from pydantic import BaseSettings, AnyHttpUrl, DirectoryPath
 
 
 class Settings(BaseSettings):
@@ -9,6 +9,7 @@ class Settings(BaseSettings):
     slug_length = 5
     environment = 'development'
     db_uri = 'sqlite:///database.db'
+    storage : DirectoryPath = 'storage/'
 
     class Config:
         env_file = '.env'
