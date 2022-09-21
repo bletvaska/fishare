@@ -1,8 +1,10 @@
 import fastapi
+from fastapi import Depends
 from sqlalchemy.exc import NoResultFound
 from sqlmodel import create_engine, Session, select
 from starlette.responses import JSONResponse
 
+from fishare.database import get_session
 from fishare.models.file_details import FileDetails
 from fishare.models.file_details_out import FileDetailsOut
 from fishare.models.problem_details import ProblemDetails
@@ -12,29 +14,23 @@ router = fastapi.APIRouter()
 
 
 @router.get('/', summary='Get list of files.', response_model=list[FileDetailsOut])
-def get_list_of_files():
-    engine = create_engine(get_settings().db_uri)
-
-    with Session(engine) as session:
-        # SELECT * FROM files
-        statement = select(FileDetails)
-        files = session.exec(statement).all()
-        return files
+def get_list_of_files(session: Session = Depends(get_session)):
+    # SELECT * FROM files
+    statement = select(FileDetails)
+    files = session.exec(statement).all()
+    return files
 
 
 @router.get('/{slug}', summary='Get file details identified by the {slug}.', response_model=FileDetailsOut)
-def get_file_detail(slug: str):
+def get_file_detail(slug: str, session: Session = Depends(get_session)):
     """
     Returns file details.
     """
-    engine = create_engine(get_settings().db_uri)
-
     try:
-        with Session(engine) as session:
-            # SELECT * FROM files WHERE slug=slug
-            statement = select(FileDetails).where(FileDetails.slug == slug)
-            file = session.exec(statement).one()
-            return file
+        # SELECT * FROM files WHERE slug=slug
+        statement = select(FileDetails).where(FileDetails.slug == slug)
+        file = session.exec(statement).one()
+        return file
     except NoResultFound as ex:
         problem = ProblemDetails(
             status=404,
