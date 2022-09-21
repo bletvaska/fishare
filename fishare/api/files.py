@@ -1,3 +1,4 @@
+import mimetypes
 import shutil
 
 import fastapi
@@ -12,7 +13,7 @@ from fishare.models.file_details import FileDetails
 from fishare.models.file_details_out import FileDetailsOut
 from fishare.models.pager import Pager
 from fishare.models.problem_details import ProblemDetails
-from fishare.models.settings import get_settings
+from fishare.models.settings import get_settings, Settings
 
 router = fastapi.APIRouter()
 
@@ -122,18 +123,19 @@ def partial_update_file(slug: str):
              summary='Uploads a file and creates file details.')
 def create_file(max_downloads: int | None = Form(None),
                 payload: UploadFile = File(...),
-                session: Session = Depends(get_session)):
+                session: Session = Depends(get_session),
+                settings: Settings = Depends(get_settings)):
 
     # create file object
     file = FileDetails(
         max_downloads=max_downloads,
         filename=payload.filename,
-        mime_type=payload.content_type,
+        mime_type=mimetypes.guess_type(payload.filename)[0],  # payload.content_type
         size=-1
     )
 
     # create path for file to save
-    path = get_settings().storage / file.slug
+    path = settings.storage / file.slug
 
     # save file
     with open(path, 'wb') as dest:
