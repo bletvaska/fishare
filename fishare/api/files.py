@@ -123,9 +123,8 @@ def partial_update_file(slug: str):
 def create_file(max_downloads: int | None = Form(None),
                 payload: UploadFile = File(...),
                 session: Session = Depends(get_session)):
-    # print(payload)
-    # print(max_downloads)
 
+    # create file object
     file = FileDetails(
         max_downloads=max_downloads,
         filename=payload.filename,
@@ -139,5 +138,13 @@ def create_file(max_downloads: int | None = Form(None),
     # save file
     with open(path, 'wb') as dest:
         shutil.copyfileobj(payload.file, dest)
+
+    # get file size
+    file.size = path.stat().st_size
+
+    # save to db
+    session.add(file)
+    session.commit()
+    session.refresh(file)
 
     return file
