@@ -64,7 +64,7 @@ def get_file_detail(request: Request, slug: str, session: Session = Depends(get_
             status=404,
             title='File not found',
             detail=f"File with slug '{slug}' does not exist.",
-            instance=f'{request.url.path}{slug}'
+            instance=f'{request.url.path}'
         )
 
         return JSONResponse(
@@ -91,7 +91,7 @@ async def delete_file(request: Request, slug: str, session: Session = Depends(ge
             status=404,
             title='File not found',
             detail=f"File with slug '{slug}' does not exist.",
-            instance=f'{request.url.path}{slug}'
+            instance=f'{request.url.path}'
         )
 
         return JSONResponse(
@@ -101,13 +101,33 @@ async def delete_file(request: Request, slug: str, session: Session = Depends(ge
         )
 
 
-
 # UPDATE files WHERE slug=slug SET ....
 # full update
-@router.put('/{slug}', summary='Updates the file identified by the {slug}. Any parameters not provided are reset to '
-                               'their defaults.')
-def full_update_file(slug: str):
-    return f'full update for file {slug}'
+@router.put('/{slug}', response_model=FileDetailsOut, status_code=200,
+            summary='Updates the file identified by the {slug}. Any parameters not provided are reset to '
+                    'their defaults.')
+def full_update_file(request: Request, slug: str,
+                     max_downloads: int = Form(None),
+                     payload: UploadFile = File(...),
+                     session: Session = Depends(get_session),
+                     settings: Settings = Depends(get_settings)):
+    try:
+        statement = select(FileDetails).where(FileDetails.slug == slug)
+        file = session.exec(statement).one()
+        return file
+    except NoResultFound as ex:
+        problem = ProblemDetails(
+            status=404,
+            title='File not found',
+            detail=f"File with slug '{slug}' does not exist.",
+            instance=f'{request.url.path}'
+        )
+
+        return JSONResponse(
+            status_code=problem.status,
+            content=problem.dict(),
+            media_type='application/problem+json'
+        )
 
 
 # UPDATE files WHERE slug=slug SET ....
@@ -125,7 +145,6 @@ def create_file(max_downloads: int | None = Form(None),
                 payload: UploadFile = File(...),
                 session: Session = Depends(get_session),
                 settings: Settings = Depends(get_settings)):
-
     # create file object
     file = FileDetails(
         max_downloads=max_downloads,
