@@ -23,6 +23,11 @@ def download_file(request: Request, slug: str,
         statement = select(FileDetails).where(FileDetails.slug == slug)
         file = session.exec(statement).one()
 
+        # update the number of downloads
+        file.downloads += 1
+        session.commit()
+        session.refresh(file)
+
         # return file
         return FileResponse(
             settings.storage / file.slug,   # path
