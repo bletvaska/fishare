@@ -4,6 +4,7 @@ from fishare.models.file_details_out import FileDetailsOut
 
 
 class Pager(BaseModel):
+    count: int
     results: list[FileDetailsOut] = []
     next: AnyHttpUrl = None
     first: AnyHttpUrl = None
