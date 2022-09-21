@@ -47,7 +47,7 @@ def get_list_of_files(request: Request, page: int = 1, size: int = 50,
 
 
 @router.get('/{slug}', summary='Get file details identified by the {slug}.', response_model=FileDetailsOut)
-def get_file_detail(slug: str, session: Session = Depends(get_session)):
+def get_file_detail(request: Request, slug: str, session: Session = Depends(get_session)):
     """
     Returns file details.
     """
@@ -61,7 +61,7 @@ def get_file_detail(slug: str, session: Session = Depends(get_session)):
             status=404,
             title='File not found',
             detail=f"File with slug '{slug}' does not exist.",
-            instance=f'/api/v1/files/{slug}'
+            instance=f'{request.url.path}{slug}'
         )
 
         return JSONResponse(
@@ -75,7 +75,7 @@ def get_file_detail(slug: str, session: Session = Depends(get_session)):
 
 # DELETE FROM files WHERE slug=slug
 @router.delete('/{slug}', summary='Delete the file identified by the {slug}.', status_code=204)
-def delete_file(slug: str, session: Session = Depends(get_session)):
+async def delete_file(request: Request, slug: str, session: Session = Depends(get_session)):
     try:
         statement = select(FileDetails).where(FileDetails.slug == slug)
         file = session.exec(statement).one()
@@ -87,7 +87,7 @@ def delete_file(slug: str, session: Session = Depends(get_session)):
             status=404,
             title='File not found',
             detail=f"File with slug '{slug}' does not exist.",
-            instance=f'/api/v1/files/{slug}'
+            instance=f'{request.url.path}{slug}'
         )
 
         return JSONResponse(
