@@ -15,19 +15,21 @@ router = fastapi.APIRouter()
 
 
 @router.get('/', summary='Get list of files.', response_model=Pager)
-def get_list_of_files(offset: int = 0, page_size: int = 50, session: Session = Depends(get_session)):
-    # SELECT * FROM files LIMIT (offset - 1) * page_size, page_size
-    statement = select(FileDetails).offset((offset - 1) * page_size).limit(page_size)
-    files = session.exec(statement).all()
-
+def get_list_of_files(page: int = 1, page_size: int = 50, session: Session = Depends(get_session)):
+    # create pager object
     pager = Pager()
 
     # count nr of files
     pager.count = session.query(FileDetails).count()
-    pager.results = files
 
+    # get files
+    # SELECT * FROM files LIMIT (offset - 1) * page_size, page_size
+    statement = select(FileDetails).offset((page - 1) * page_size).limit(page_size)
+    pager.results = session.exec(statement).all()
+
+    # create links to first and last page
     pager.first = f'{get_settings().base_url}/api/v1/files?page_size={page_size}'
-    pager.last = f'{get_settings().base_url}/api/v1/files?page_size={page_size}&offset='
+    pager.last = f'{get_settings().base_url}/api/v1/files?page_size={page_size}&page={pager.count // page_size + 1}'
 
     return pager
 
