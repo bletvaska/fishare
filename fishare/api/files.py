@@ -16,7 +16,8 @@ router = fastapi.APIRouter()
 
 
 @router.get('/', summary='Get list of files.', response_model=Pager)
-def get_list_of_files(request: Request, page: int = 1, size: int = 50, session: Session = Depends(get_session)):
+def get_list_of_files(request: Request, page: int = 1, size: int = 50,
+                      session: Session = Depends(get_session)):
     url = f'{get_settings().base_url}{request.url.path}'
 
     # create pager object
@@ -73,9 +74,14 @@ def get_file_detail(slug: str, session: Session = Depends(get_session)):
 
 
 # DELETE FROM files WHERE slug=slug
-@router.delete('/{slug}', summary='Delete the file identified by the {slug}.')
-def delete_file(slug: str):
-    return f'deleted file {slug}'
+@router.delete('/{slug}', summary='Delete the file identified by the {slug}.', status_code=204)
+def delete_file(slug: str, session: Session = Depends(get_session)):
+    statement = select(FileDetails).where(FileDetails.slug == slug)
+    file = session.exec(statement).one()
+    session.delete(file)
+    session.commit()
+    # return
+
 
 
 # UPDATE files WHERE slug=slug SET ....
