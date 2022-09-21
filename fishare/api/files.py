@@ -16,7 +16,7 @@ router = fastapi.APIRouter()
 
 
 @router.get('/', summary='Get list of files.', response_model=Pager)
-def get_list_of_files(request: Request, page: int = 1, page_size: int = 50, session: Session = Depends(get_session)):
+def get_list_of_files(request: Request, page: int = 1, size: int = 50, session: Session = Depends(get_session)):
     url = f'{get_settings().base_url}{request.url.path}'
 
     # create pager object
@@ -27,20 +27,20 @@ def get_list_of_files(request: Request, page: int = 1, page_size: int = 50, sess
 
     # get files
     # SELECT * FROM files LIMIT (offset - 1) * page_size, page_size
-    statement = select(FileDetails).offset((page - 1) * page_size).limit(page_size)
+    statement = select(FileDetails).offset((page - 1) * size).limit(size)
     pager.results = session.exec(statement).all()
 
     # create links to first and last page
-    pager.first = f'{url}?page_size={page_size}'
-    pager.last = f'{url}?page_size={page_size}&page={pager.count // page_size + 1}'
+    pager.first = f'{url}?page_size={size}'
+    pager.last = f'{url}?page_size={size}&page={pager.count // size + 1}'
 
     # next page
-    if page + 1 <= pager.count // page_size + 1:
-        pager.next = f'{url}?page_size={page_size}&page={page + 1}'
+    if page + 1 <= pager.count // size + 1:
+        pager.next = f'{url}?page_size={size}&page={page + 1}'
 
     # previous page
     if page - 1 > 0:
-        pager.previous = f'{url}?page_size={page_size}&page={page - 1}'
+        pager.previous = f'{url}?page_size={size}&page={page - 1}'
 
     return pager
 
