@@ -26,6 +26,9 @@ def get_list_of_files(offset: int = 0, page_size: int = 50, session: Session = D
     pager.count = session.query(FileDetails).count()
     pager.results = files
 
+    pager.first = f'{get_settings().base_url}/api/v1/files?page_size={page_size}'
+    pager.last = f'{get_settings().base_url}/api/v1/files?page_size={page_size}&offset='
+
     return pager
 
 
