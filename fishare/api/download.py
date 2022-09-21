@@ -23,6 +23,10 @@ def download_file(request: Request, slug: str,
         statement = select(FileDetails).where(FileDetails.slug == slug)
         file = session.exec(statement).one()
 
+        # if more downloads then max downloads, then NotFound
+        if file.downloads >= file.max_downloads:
+            raise NoResultFound
+
         # update the number of downloads
         file.downloads += 1
         session.commit()
