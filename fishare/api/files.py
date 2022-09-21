@@ -117,10 +117,17 @@ def full_update_file(request: Request, slug: str,
         statement = select(FileDetails).where(FileDetails.slug == slug)
         file = session.exec(statement).one()
 
-        # update max_uploads
-        file.max_downloads = max_downloads
+        # create path for file to save
+        path = settings.storage / file.slug
 
-        # update updated_at
+        # save file
+        with open(path, 'wb') as dest:
+            shutil.copyfileobj(payload.file, dest)
+
+        # update file fields
+        file.size = path.stat().st_size
+        file.filename = payload.filename
+        file.max_downloads = max_downloads
         file.updated_at = datetime.now()
 
         # update db
