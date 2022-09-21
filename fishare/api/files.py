@@ -14,9 +14,9 @@ router = fastapi.APIRouter()
 
 
 @router.get('/', summary='Get list of files.', response_model=list[FileDetailsOut])
-def get_list_of_files(session: Session = Depends(get_session)):
-    # SELECT * FROM files
-    statement = select(FileDetails)
+def get_list_of_files(offset: int = 0, page_size: int = 50, session: Session = Depends(get_session)):
+    # SELECT * FROM files LIMIT (offset - 1) * page_size, page_size
+    statement = select(FileDetails).offset((offset - 1) * page_size).limit(page_size)
     files = session.exec(statement).all()
     return files
 
