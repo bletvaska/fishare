@@ -51,7 +51,8 @@ def get_list_of_files(request: Request, page: int = 1, size: int = 50,
 
 
 @router.get('/{slug}', summary='Get file details identified by the {slug}.', response_model=FileDetailsOut)
-def get_file_detail(request: Request, slug: str, session: Session = Depends(get_session)):
+def get_file_detail(request: Request, slug: str,
+                    session: Session = Depends(get_session)):
     """
     Returns file details.
     """
@@ -79,7 +80,8 @@ def get_file_detail(request: Request, slug: str, session: Session = Depends(get_
 
 # DELETE FROM files WHERE slug=slug
 @router.delete('/{slug}', summary='Delete the file identified by the {slug}.', status_code=204)
-async def delete_file(request: Request, slug: str, session: Session = Depends(get_session)):
+async def delete_file(request: Request, slug: str,
+                      session: Session = Depends(get_session)):
     try:
         statement = select(FileDetails).where(FileDetails.slug == slug)
         file = session.exec(statement).one()

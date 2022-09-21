@@ -9,7 +9,6 @@ from fishare.models.settings import get_settings
 
 
 class FileDetails(SQLModel, table=True):
-    # id: Optional[int] = Field(default=None, primary_key=True)
     id: int | None = Field(default=None, primary_key=True)
     slug: str | None = None
     filename: str
@@ -17,7 +16,7 @@ class FileDetails(SQLModel, table=True):
     max_downloads = 1
     size: int
     mime_type: str = 'application/octet-stream'
-    created_at: datetime | None = None  # Optional[datetime] = None
+    created_at: datetime | None = None
     updated_at: datetime | None = None
 
     @validator('mime_type')

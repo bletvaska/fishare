@@ -1,15 +1,13 @@
 import uvicorn
+
 from fastapi import FastAPI
-from sqlmodel import create_engine, SQLModel
 
-from fishare.api import files
-
-# application init
-from fishare.helpers import populate_data
+from fishare.api import files, download
 from fishare.models.settings import get_settings
 
 app = FastAPI()
 app.include_router(files.router, prefix='/api/v1/files')
+app.include_router(download.router, prefix='')
 
 
 @app.get("/")
