@@ -31,6 +31,14 @@ def get_list_of_files(page: int = 1, page_size: int = 50, session: Session = Dep
     pager.first = f'{get_settings().base_url}/api/v1/files?page_size={page_size}'
     pager.last = f'{get_settings().base_url}/api/v1/files?page_size={page_size}&page={pager.count // page_size + 1}'
 
+    # next page
+    if page + 1 <= pager.count // page_size + 1:
+        pager.next = f'{get_settings().base_url}/api/v1/files?page_size={page_size}&page={page + 1}'
+
+    # previous page
+    if page - 1 > 0:
+        pager.previous = f'{get_settings().base_url}/api/v1/files?page_size={page_size}&page={page - 1}'
+
     return pager
 
 
