@@ -76,11 +76,25 @@ def get_file_detail(slug: str, session: Session = Depends(get_session)):
 # DELETE FROM files WHERE slug=slug
 @router.delete('/{slug}', summary='Delete the file identified by the {slug}.', status_code=204)
 def delete_file(slug: str, session: Session = Depends(get_session)):
-    statement = select(FileDetails).where(FileDetails.slug == slug)
-    file = session.exec(statement).one()
-    session.delete(file)
-    session.commit()
-    # return
+    try:
+        statement = select(FileDetails).where(FileDetails.slug == slug)
+        file = session.exec(statement).one()
+        session.delete(file)
+        session.commit()
+        # return
+    except NoResultFound as ex:
+        problem = ProblemDetails(
+            status=404,
+            title='File not found',
+            detail=f"File with slug '{slug}' does not exist.",
+            instance=f'/api/v1/files/{slug}'
+        )
+
+        return JSONResponse(
+            status_code=problem.status,
+            content=problem.dict(),
+            media_type='application/problem+json'
+        )
 
 
 
