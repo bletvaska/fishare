@@ -7,18 +7,25 @@ from starlette.responses import JSONResponse
 from fishare.database import get_session
 from fishare.models.file_details import FileDetails
 from fishare.models.file_details_out import FileDetailsOut
+from fishare.models.pager import Pager
 from fishare.models.problem_details import ProblemDetails
 from fishare.models.settings import get_settings
 
 router = fastapi.APIRouter()
 
 
-@router.get('/', summary='Get list of files.', response_model=list[FileDetailsOut])
+@router.get('/', summary='Get list of files.', response_model=Pager)
 def get_list_of_files(offset: int = 0, page_size: int = 50, session: Session = Depends(get_session)):
     # SELECT * FROM files LIMIT (offset - 1) * page_size, page_size
     statement = select(FileDetails).offset((offset - 1) * page_size).limit(page_size)
     files = session.exec(statement).all()
-    return files
+
+    pager = Pager()
+
+    # count nr of files
+    pager.count = session.query(FileDetails).count()
+
+    return pager
 
 
 @router.get('/{slug}', summary='Get file details identified by the {slug}.', response_model=FileDetailsOut)
