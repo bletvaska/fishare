@@ -1,7 +1,7 @@
 import fastapi
-from fastapi import Depends
+from fastapi import Depends, Form, UploadFile, File
 from sqlalchemy.exc import NoResultFound
-from sqlmodel import create_engine, Session, select
+from sqlmodel import Session, select
 from starlette.requests import Request
 from starlette.responses import JSONResponse
 
@@ -70,7 +70,7 @@ def get_file_detail(request: Request, slug: str, session: Session = Depends(get_
             media_type='application/problem+json'
         )
 
-        # return ProblemDetailsResponse(problem)
+        # return ProblemResponse(problem)
 
 
 # DELETE FROM files WHERE slug=slug
@@ -82,6 +82,7 @@ async def delete_file(request: Request, slug: str, session: Session = Depends(ge
         session.delete(file)
         session.commit()
         # return
+
     except NoResultFound as ex:
         problem = ProblemDetails(
             status=404,
@@ -115,6 +116,9 @@ def partial_update_file(slug: str):
 
 
 # INSERT INTO files VALUES(...)
-@router.post('/', summary='Uploads a file and creates file details.')
-def create_file():
-    return 'file was created'
+@router.post('/', summary='Uploads a file and creates file details.', status_code=201)
+def create_file(max_downloads: str | None = Form(None),
+                payload: UploadFile = File(...),
+                session: Session = Depends(get_session)):
+    print(payload)
+    return max_downloads
