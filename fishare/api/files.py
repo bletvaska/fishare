@@ -24,6 +24,7 @@ def get_list_of_files(offset: int = 0, page_size: int = 50, session: Session = D
 
     # count nr of files
     pager.count = session.query(FileDetails).count()
+    pager.results = files
 
     return pager
 
