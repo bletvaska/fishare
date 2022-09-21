@@ -31,16 +31,16 @@ def get_list_of_files(request: Request, page: int = 1, size: int = 50, session: 
     pager.results = session.exec(statement).all()
 
     # create links to first and last page
-    pager.first = f'{url}?page_size={size}'
-    pager.last = f'{url}?page_size={size}&page={pager.count // size + 1}'
+    pager.first = f'{url}?size={size}'
+    pager.last = f'{url}?size={size}&page={pager.count // size + 1}'
 
     # next page
     if page + 1 <= pager.count // size + 1:
-        pager.next = f'{url}?page_size={size}&page={page + 1}'
+        pager.next = f'{url}?size={size}&page={page + 1}'
 
     # previous page
     if page - 1 > 0:
-        pager.previous = f'{url}?page_size={size}&page={page - 1}'
+        pager.previous = f'{url}?size={size}&page={page - 1}'
 
     return pager
 
