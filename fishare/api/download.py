@@ -21,12 +21,9 @@ def download_file(request: Request, slug: str,
                   settings: Settings = Depends(get_settings)):
     try:
         # get file by slug
-        statement = select(FileDetails).where(FileDetails.slug == slug)
+        # SELECT * FROM filedetails WHERE slug={slug} AND downloads < max_downloads
+        statement = select(FileDetails).where(FileDetails.slug == slug).where(FileDetails.downloads < FileDetails.max_downloads)
         file = session.exec(statement).one()
-
-        # if more downloads then max downloads, then NotFound
-        if file.downloads >= file.max_downloads:
-            raise NoResultFound
 
         # update the number of downloads
         if request.method == 'GET':
