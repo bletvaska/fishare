@@ -1,3 +1,4 @@
+from datetime import datetime
 import mimetypes
 import shutil
 
@@ -112,8 +113,21 @@ def full_update_file(request: Request, slug: str,
                      session: Session = Depends(get_session),
                      settings: Settings = Depends(get_settings)):
     try:
+        # select file with given slug
         statement = select(FileDetails).where(FileDetails.slug == slug)
         file = session.exec(statement).one()
+
+        # update max_uploads
+        file.max_downloads = max_downloads
+
+        # update updated_at
+        file.updated_at = datetime.now()
+
+        # update db
+        session.add(file)
+        session.commit()
+        session.refresh(file)
+
         return file
     except NoResultFound as ex:
         problem = ProblemDetails(
