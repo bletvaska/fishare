@@ -108,7 +108,7 @@ async def delete_file(request: Request, slug: str, session: Session = Depends(ge
             summary='Updates the file identified by the {slug}. Any parameters not provided are reset to '
                     'their defaults.')
 def full_update_file(request: Request, slug: str,
-                     max_downloads: int = Form(None),
+                     max_downloads: int = Form(),
                      payload: UploadFile = File(...),
                      session: Session = Depends(get_session),
                      settings: Settings = Depends(get_settings)):
