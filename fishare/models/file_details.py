@@ -21,7 +21,6 @@ class FileDetails(SQLModel, table=True):
 
     @validator('mime_type')
     def mime_type_must_contain_slash(cls, v):
-        # print('>> validating mime_type')
         if '/' not in v:
             raise ValueError('must contain "/"')
         else:
@@ -42,8 +41,7 @@ class FileDetails(SQLModel, table=True):
         return datetime.now()
 
     @validator('expires', always=True)
-    def set_expiration_for_24_hours(cls, v):
-        print('>> setting expiration')
+    def set_expiration_for_one_day(cls, v):
         return datetime.now() + timedelta(days=1)
 
     @validator('slug', always=True)

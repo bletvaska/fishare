@@ -2,6 +2,7 @@ from datetime import datetime
 
 import fastapi
 from fastapi import Depends
+from sqlalchemy import or_
 from sqlmodel import select, Session
 
 from fishare.database import get_session
@@ -16,9 +17,11 @@ def cleanup(session: Session = Depends(get_session),
             settings: Settings = Depends(get_settings)):
     start = datetime.now()
 
-    # SELECT * FROM filedetails WHERE downloads >= max_downloads
-    statement = select(FileDetails) \
-        .where(FileDetails.downloads >= FileDetails.max_downloads)
+    # SELECT * FROM filedetails WHERE downloads >= max_downloads OR now() > expires;
+    statement = select(FileDetails).where(or_(
+        FileDetails.downloads >= FileDetails.max_downloads,
+        datetime.now() > FileDetails.expires
+    ))
     files = session.exec(statement).all()
 
     # delete files
