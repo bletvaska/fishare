@@ -11,6 +11,7 @@ uvicorn = "^0.18.3"
 pydantic = {extras = ["dotenv"], version = "^1.10.2"}
 sqlmodel = "^0.0.8"
 python-multipart = "^0.0.5"
+Jinja2 = "^3.1.2"
 
 [tool.poetry.dev-dependencies]
 ipython = "^8.5.0"
