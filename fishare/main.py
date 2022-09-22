@@ -7,8 +7,8 @@ from fishare.models.settings import get_settings
 
 app = FastAPI()
 app.include_router(files.router, prefix='/api/v1/files')
-app.include_router(download.router, prefix='')
 app.include_router(healthcheck.router, prefix='/health')
+app.include_router(download.router, prefix='')
 
 
 @app.get("/")
