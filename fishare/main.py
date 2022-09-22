@@ -1,6 +1,7 @@
 import uvicorn
 
 from fastapi import FastAPI
+from sqlmodel import create_engine, SQLModel
 
 from fishare.api import files, download, healthcheck, cron
 from fishare.models.settings import get_settings
@@ -22,7 +23,7 @@ def read_root():
 
 if __name__ == '__main__':
     # init database
-    # engine = create_engine(get_settings().db_uri)
-    # SQLModel.metadata.create_all(engine)
+    engine = create_engine(get_settings().db_uri)
+    SQLModel.metadata.create_all(engine)
 
     uvicorn.run('fishare.main:app', reload=True, port=get_settings().port, host='127.0.0.1')
