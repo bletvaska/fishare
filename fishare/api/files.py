@@ -28,11 +28,18 @@ def get_list_of_files(request: Request, page: int = 1, size: int = 50,
     pager = Pager()
 
     # count nr of files
+    # SELECT COUNT(*) FROM files
     pager.count = session.query(FileDetails).count()
 
     # get files
-    # SELECT * FROM files LIMIT (offset - 1) * page_size, page_size
-    statement = select(FileDetails).offset((page - 1) * size).limit(size)
+    # SELECT * FROM files
+    # WHERE downloads < max_downloads
+    # AND now() < expires
+    # LIMIT (offset - 1) * page_size, page_size
+    statement = select(FileDetails) \
+        .where(FileDetails.downloads < FileDetails.max_downloads) \
+        .where(datetime.now() < FileDetails.expires) \
+        .offset((page - 1) * size).limit(size)
     pager.results = session.exec(statement).all()
 
     # create links to first and last page
@@ -57,8 +64,11 @@ def get_file_detail(request: Request, slug: str,
     Returns file details.
     """
     try:
-        # SELECT * FROM files WHERE slug=slug
-        statement = select(FileDetails).where(FileDetails.slug == slug)
+        # SELECT * FROM files WHERE slug=slug AND downloads < max_downloads AND now() < expires
+        statement = select(FileDetails) \
+            .where(FileDetails.slug == slug) \
+            .where(FileDetails.downloads < FileDetails.max_downloads) \
+            .where(datetime.now() < FileDetails.expires)
         file = session.exec(statement).one()
         return file
     except NoResultFound as ex:
