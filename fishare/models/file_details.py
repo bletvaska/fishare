@@ -16,7 +16,7 @@ class FileDetails(SQLModel, table=True):
     max_downloads = 1
     size: int
     mime_type: str = 'application/octet-stream'
-    created_at: datetime | None = None
+    created_at: datetime | None = None  # Optional[datetime] = None
     updated_at: datetime | None = None
 
     @validator('mime_type')
