@@ -81,13 +81,19 @@ def get_file_detail(request: Request, slug: str,
 # DELETE FROM files WHERE slug=slug
 @router.delete('/{slug}', summary='Delete the file identified by the {slug}.', status_code=204)
 async def delete_file(request: Request, slug: str,
+                      settings: Settings = Depends(get_settings),
                       session: Session = Depends(get_session)):
     try:
         statement = select(FileDetails).where(FileDetails.slug == slug)
         file = session.exec(statement).one()
+
+        # delete file from storage
+        path = settings.storage / file.slug
+        path.unlink(missing_ok=True)
+
+        # delete from db
         session.delete(file)
         session.commit()
-        # return
 
     except NoResultFound as ex:
         problem = ProblemDetails(
