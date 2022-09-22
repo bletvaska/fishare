@@ -132,7 +132,12 @@ def full_update_file(request: Request, slug: str,
                      settings: Settings = Depends(get_settings)):
     try:
         # select file with given slug
-        statement = select(FileDetails).where(FileDetails.slug == slug)
+        # SELECT * FROM files WHERE slug={slug} AND downloads < max_downloads AND now() < expires
+        statement = select(FileDetails) \
+            .where(FileDetails.slug == slug) \
+            .where(FileDetails.downloads < FileDetails.max_downloads) \
+            .where(datetime.now() < FileDetails.expires)
+
         file = session.exec(statement).one()
 
         # create path for file to save
@@ -183,7 +188,11 @@ def partial_update_file(request: Request, slug: str,
                         ):
     try:
         # select file with given slug
-        statement = select(FileDetails).where(FileDetails.slug == slug)
+        statement = select(FileDetails) \
+            .where(FileDetails.slug == slug) \
+            .where(FileDetails.downloads < FileDetails.max_downloads) \
+            .where(datetime.now() < FileDetails.expires)
+
         file = session.exec(statement).one()
 
         # update filename
