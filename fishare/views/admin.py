@@ -15,6 +15,7 @@ router = fastapi.APIRouter()
 def list_of_files(request: Request,
                   jinja: Jinja2Templates = Depends(get_jinja),
                   session: Session = Depends(get_session)):
+    # get data
     # SELECT * FROM files
     statement = select(FileDetails)
     files = session.exec(statement).all()

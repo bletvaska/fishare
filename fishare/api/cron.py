@@ -12,7 +12,7 @@ from fishare.models.settings import Settings, get_settings
 router = fastapi.APIRouter()
 
 
-@router.get('/')
+@router.get('/', summary="Run background jobs.")
 def cleanup(session: Session = Depends(get_session),
             settings: Settings = Depends(get_settings)):
     start = datetime.now()

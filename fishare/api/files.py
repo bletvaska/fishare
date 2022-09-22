@@ -28,8 +28,11 @@ def get_list_of_files(request: Request, page: int = 1, size: int = 50,
     pager = Pager()
 
     # count nr of files
-    # SELECT COUNT(*) FROM files
-    pager.count = session.query(FileDetails).count()
+    # SELECT COUNT(*) FROM files WHERE downloads < max_downloads and now() < expires;
+    pager.count = session.query(FileDetails) \
+        .where(FileDetails.downloads < FileDetails.max_downloads) \
+        .where(datetime.now() < FileDetails.expires) \
+        .count()
 
     # get files
     # SELECT * FROM files
