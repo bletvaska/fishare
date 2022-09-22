@@ -1,5 +1,3 @@
-from pathlib import Path
-
 import uvicorn
 
 from fastapi import FastAPI
@@ -9,24 +7,20 @@ from starlette.staticfiles import StaticFiles
 from fishare.api import files, download, healthcheck, cron
 from fishare.models.settings import get_settings
 
+# route initialization
+from fishare.views import homepage
+
 app = FastAPI()
 app.include_router(files.router, prefix='/api/v1/files')
 app.include_router(healthcheck.router, prefix='/health')
 app.include_router(cron.router, prefix='/cron')
 app.include_router(download.router, prefix='')
+app.include_router(homepage.router, prefix='')
 
+# mount static folder
 app.mount('/static',
           StaticFiles(directory='fishare/static'),
           name='static')
-
-
-@app.get("/")
-def read_root():
-    """
-    Main homepage.
-    """
-    return "Ahoj Svet!"
-
 
 if __name__ == '__main__':
     # init database
