@@ -1,10 +1,17 @@
 import random
+from functools import lru_cache
 
 from faker import Faker
 from sqlmodel import create_engine, Session
+from starlette.templating import Jinja2Templates
 
 from fishare.models.file_details import FileDetails
 from fishare.models.settings import get_settings
+
+
+@lru_cache
+def get_jinja() -> Jinja2Templates:
+    return Jinja2Templates(directory='fishare/templates/')
 
 
 def populate_data(count: int = 100):
