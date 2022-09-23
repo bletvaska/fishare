@@ -1,27 +1,13 @@
-FROM python:3.10-alpine AS builder
-
-RUN apk add \
-        gcc \
-        g++ \
-        musl-dev \
-    && mkdir /wheels
-
-COPY dist/fishare-0.9.0-py3-none-any.whl /wheels/
-
-RUN pip install wheel \
-    && pip wheel --wheel-dir=/wheels/ /wheels/fishare-0.9.0-py3-none-any.whl
-
-
-FROM python:3.10-alpine AS base
+FROM python:3.10-slim
 LABEL maintainer "mirek <mirek@cnl.sk>"
 
 RUN adduser --no-create-home --disabled-password --gecos "" appuser
 
-COPY --from=builder /wheels/*whl /tmp/
-RUN cd /tmp \
-    && pip install *whl \
+COPY dist/fishare-0.9.0-py3-none-any.whl /tmp/
+
+RUN pip install /tmp/fishare-0.9.0-py3-none-any.whl \
     && pip cache purge \
-    && rm -rf *whl \
+    && rm /tmp/*whl \
     && mkdir -p /app/storage \
     && chown -R appuser.appuser /app
 
