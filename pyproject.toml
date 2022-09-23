@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "fishare"
-version = "0.1.0"
+version = "0.8.0"
 description = "The file sharing microservice written in FastAPI."
 authors = ["Miroslav Biňas <miroslav.binas@tuke.sk>"]
 
@@ -24,3 +24,7 @@ python-magic = "^0.4.27"
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+fishare = "fishare.main:main"  # python - m fishare.main
+fishare_init = "fishare.helpers:populate_data"
