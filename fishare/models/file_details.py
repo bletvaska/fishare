@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 from pydantic import validator
 from sqlmodel import SQLModel, Field
 
-from fishare.models.settings import get_settings
+from fishare.dependencies import get_settings
 
 
 class FileDetails(SQLModel, table=True):

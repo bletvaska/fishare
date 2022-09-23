@@ -5,9 +5,9 @@ from fastapi import Depends
 from sqlalchemy import or_
 from sqlmodel import select, Session
 
-from fishare.database import get_session
+from fishare.dependencies import get_session, get_settings
 from fishare.models.file_details import FileDetails
-from fishare.models.settings import Settings, get_settings
+from fishare.models.settings import Settings
 
 router = fastapi.APIRouter()
 

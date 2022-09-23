@@ -1,6 +1,7 @@
 from pydantic import BaseModel, validator, HttpUrl
 
-from fishare.models.settings import Settings, get_settings
+from fishare.dependencies import get_settings
+from fishare.models.settings import Settings
 
 
 class FileDetailsOut(BaseModel):

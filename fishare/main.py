@@ -7,8 +7,8 @@ from starlette.staticfiles import StaticFiles
 from starlette_prometheus import PrometheusMiddleware, metrics
 
 from fishare.api import files, download, healthcheck, cron
+from fishare.dependencies import get_settings
 from fishare.middlewares import add_process_time_header
-from fishare.models.settings import get_settings
 from fishare.views import homepage, admin
 
 app = FastAPI()

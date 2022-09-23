@@ -9,12 +9,12 @@ from sqlmodel import Session, select
 from starlette.requests import Request
 from starlette.responses import JSONResponse
 
-from fishare.database import get_session
+from fishare.dependencies import get_session, get_settings
 from fishare.models.file_details import FileDetails
 from fishare.models.file_details_out import FileDetailsOut
 from fishare.models.pager import Pager
 from fishare.models.problem_details import ProblemDetails
-from fishare.models.settings import get_settings, Settings
+from fishare.models.settings import Settings
 
 router = fastapi.APIRouter()
 

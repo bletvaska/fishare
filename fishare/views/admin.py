@@ -4,8 +4,7 @@ from sqlmodel import select, Session
 from starlette.requests import Request
 from starlette.templating import Jinja2Templates
 
-from fishare.database import get_session
-from fishare.helpers import get_jinja
+from fishare.dependencies import get_jinja, get_session
 from fishare.models.file_details import FileDetails
 
 router = fastapi.APIRouter()

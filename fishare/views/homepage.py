@@ -3,7 +3,7 @@ from fastapi import Depends
 from starlette.requests import Request
 from starlette.templating import Jinja2Templates
 
-from fishare.helpers import get_jinja
+from fishare.dependencies import get_jinja
 
 router = fastapi.APIRouter()
 
