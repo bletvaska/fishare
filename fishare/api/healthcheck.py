@@ -16,7 +16,7 @@ def check_db_state(session: Session):
 def check_storage_state(settings: Settings):
     return settings.storage.exists() \
            and settings.storage.is_dir() \
-           and settings.storage.owner() == 'mirek'
+           and settings.storage.owner() == 'mirek'  # will not work when running in Docker container :-P
 
 
 @router.get('/', status_code=200)

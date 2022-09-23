@@ -2,6 +2,7 @@ import secrets
 from datetime import datetime, timedelta
 
 from pydantic import validator
+from sqladmin import ModelView
 from sqlmodel import SQLModel, Field
 
 from fishare.dependencies import get_settings
@@ -47,3 +48,14 @@ class FileDetails(SQLModel, table=True):
     @validator('slug', always=True)
     def set_secret_slug(cls, v):
         return secrets.token_urlsafe(get_settings().slug_length)
+
+
+class FileDetailsAdmin(ModelView, model=FileDetails):
+    column_list = [
+        FileDetails.filename,
+        FileDetails.slug,
+        FileDetails.mime_type,
+        FileDetails.size,
+        FileDetails.downloads,
+        FileDetails.max_downloads
+    ]
