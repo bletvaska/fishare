@@ -1,6 +1,4 @@
-from dataclasses import Field
-
-from sqlmodel import SQLModel, create_engine, Session, select
+from sqlmodel import Field, SQLModel, create_engine, Session, select
 
 
 class Pokemon(SQLModel, table=True):
