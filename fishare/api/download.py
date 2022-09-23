@@ -6,6 +6,7 @@ from starlette.requests import Request
 from starlette.responses import JSONResponse, FileResponse
 
 from fishare.database import get_session
+from fishare.decorators import log_client_ip
 from fishare.models.file_details import FileDetails
 from fishare.models.problem_details import ProblemDetails
 from fishare.models.settings import get_settings, Settings
@@ -16,9 +17,11 @@ router = fastapi.APIRouter()
 @router.head('/{slug}')
 @router.get('/{slug}', status_code=200,
             summary='Download file by {slug}.')
-def download_file(request: Request, slug: str,
-                  session: Session = Depends(get_session),
-                  settings: Settings = Depends(get_settings)):
+@log_client_ip
+async def download_file(request: Request, slug: str,
+                        session: Session = Depends(get_session),
+                        settings: Settings = Depends(get_settings)):
+    print('>> downloading')
     try:
         # get file by slug
         # SELECT * FROM filedetails WHERE slug={slug} AND downloads < max_downloads
@@ -28,7 +31,7 @@ def download_file(request: Request, slug: str,
         file = session.exec(statement).one()
 
         # update the number of downloads
-        if request.method == 'GET':
+        if request.method.upper() == 'GET':
             file.downloads += 1
             session.commit()
             session.refresh(file)

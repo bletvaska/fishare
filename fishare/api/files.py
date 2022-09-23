@@ -62,7 +62,7 @@ def get_list_of_files(request: Request, page: int = 1, size: int = 50,
 
 
 @router.get('/{slug}', summary='Get file details identified by the {slug}.', response_model=FileDetailsOut)
-def get_file_detail(request: Request, slug: str,
+async def get_file_detail(request: Request, slug: str,
                     session: Session = Depends(get_session)):
     """
     Returns file details.
