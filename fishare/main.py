@@ -4,6 +4,7 @@ from fastapi import FastAPI
 from sqlmodel import create_engine, SQLModel
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.staticfiles import StaticFiles
+from starlette_prometheus import PrometheusMiddleware, metrics
 
 from fishare.api import files, download, healthcheck, cron
 from fishare.middlewares import add_process_time_header
@@ -12,16 +13,18 @@ from fishare.views import homepage, admin
 
 app = FastAPI()
 
+# add middleware functions
+app.add_middleware(BaseHTTPMiddleware, dispatch=add_process_time_header)
+app.add_middleware(PrometheusMiddleware)
+
 # add routes
+app.add_route("/metrics/", metrics)
 app.include_router(files.router, prefix='/api/v1/files')
 app.include_router(healthcheck.router, prefix='/health')
 app.include_router(cron.router, prefix='/cron')
 app.include_router(admin.router, prefix='/admin')
 app.include_router(download.router, prefix='')
 app.include_router(homepage.router, prefix='')
-
-# add middleware functions
-app.add_middleware(BaseHTTPMiddleware, dispatch=add_process_time_header)
 
 # mount static folder
 app.mount('/static',

@@ -21,8 +21,9 @@ router = fastapi.APIRouter()
 
 @router.get('/', summary='Get list of files.', response_model=Pager)
 def get_list_of_files(request: Request, page: int = 1, size: int = 50,
-                      session: Session = Depends(get_session)):
-    url = f'{get_settings().base_url}{request.url.path}'
+                      session: Session = Depends(get_session),
+                      settings: Settings = Depends(get_settings)):
+    url = f'{settings.base_url}{request.url.path}'
 
     # create pager object
     pager = Pager()
