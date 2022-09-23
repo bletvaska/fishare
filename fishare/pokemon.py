@@ -11,7 +11,7 @@ class Pokemon(SQLModel, table=True):
     type2: str
 
 
-db_uri = 'sqlite:////tmp/pokedex.sqlite'
+db_uri = 'sqlite:///pokedex.sqlite'
 
 engine = create_engine(db_uri)
 with Session(engine) as session:
