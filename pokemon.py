@@ -1,4 +1,7 @@
-from sqlmodel import Field, SQLModel, create_engine, Session, select
+import sqlalchemy
+import sqlmodel
+from sqlalchemy.ext.automap import automap_base
+from sqlmodel import Field, SQLModel, Session, select
 
 
 class Pokemon(SQLModel, table=True):
@@ -11,9 +14,27 @@ class Pokemon(SQLModel, table=True):
 
 db_uri = 'sqlite:///pokedex.sqlite'
 
-engine = create_engine(db_uri)
-with Session(engine) as session:
-    statement = select(Pokemon).limit(10)
-    pokemons = session.exec(statement).all()
 
-    print(pokemons)
+def pokedex_with_sqlmodel():
+    engine = sqlmodel.create_engine(db_uri)
+    with Session(engine) as session:
+        statement = select(Pokemon).limit(10)
+        pokemons = session.exec(statement).all()
+
+        print(pokemons)
+
+
+def pokedex_with_sqlalchemy():
+    Base = automap_base()
+    engine = sqlalchemy.create_engine('sqlite:///database.db')
+    Base.prepare(autoload_with=engine)
+
+    FileDetails = Base.classes.filedetails
+
+    with sqlalchemy.orm.Session(engine) as session:
+        files = session.query(FileDetails).all()
+        for file in files:
+            print(file.filename)
+
+
+pokedex_with_sqlalchemy()
