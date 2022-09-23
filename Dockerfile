@@ -9,7 +9,12 @@ RUN pip install /tmp/fishare-0.9.0-py3-none-any.whl \
     && pip cache purge \
     && rm /tmp/*whl \
     && mkdir -p /app/storage \
-    && chown -R appuser.appuser /app
+    && chown -R appuser.appuser /app \
+    && apt update && apt install -y curl \
+    && rm -rf /var/lib/apt/lists/*
+
+HEALTHCHECK --interval=10s --timeout=3s \
+    CMD curl -f http://localhost:8000/health/ || exit 1
 
 USER appuser
 WORKDIR /app
