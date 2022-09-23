@@ -50,7 +50,7 @@ def main():
     engine = create_engine(get_settings().db_uri)
     SQLModel.metadata.create_all(engine)
 
-    uvicorn.run('fishare.main:app', reload=True, port=get_settings().port, host='127.0.0.1')
+    uvicorn.run('fishare.main:app', reload=True, port=get_settings().port, host='0.0.0.0')
 
 
 if __name__ == '__main__':

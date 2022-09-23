@@ -12,6 +12,6 @@ class Settings(BaseSettings):
     storage: DirectoryPath = 'storage/'
 
     class Config:
-        env_file = '.env'
+        env_file = 'local.env'
         env_file_encoding = 'utf-8'
         env_prefix = 'fishare_'
