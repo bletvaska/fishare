@@ -15,6 +15,8 @@ pydantic = {extras = ["dotenv"], version = "^1.10.2"}
 ipython = "^8.7.0"
 pytest = "^7.2.0"
 black = "^22.10.0"
+httpx = "^0.23.1"
+faker = "^15.3.3"
 
 [build-system]
 requires = ["poetry-core"]
@@ -22,3 +24,13 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.scripts]
 fishare = "fishare.main:main"  # python - m fishare.main
+
+[tool.pytest.ini_options]
+addopts = []
+testpaths = ["tests/"]
+python_files = ["test_*.py"]
+markers = [
+    "wip: work in progress",
+    "models",
+    "file"
+]

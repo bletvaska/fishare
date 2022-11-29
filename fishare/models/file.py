@@ -38,3 +38,8 @@ class File(BaseModel):
     @validator('expires', always=True)
     def set_expiration_for_one_day(cls, v):
         return datetime.now() + timedelta(days=1)
+
+    @validator('filename')
+    def filename_cant_be_empty(cls, v):
+        if v == '':
+            raise ValueError("can't be empty")
