@@ -23,4 +23,3 @@ Znalosť jazyka Python na tomto školení je nutná.
 * šablónovací systém Jinja2
 * zbieranie metrík
 * balenie Python aplikácií do Docker obrazov
-
