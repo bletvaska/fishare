@@ -127,3 +127,10 @@ a potom pofici aj `pip3`
 * [SQLite](https://marketplace.visualstudio.com/items?itemName=alexcvzz.vscode-sqlite)
 * [Even Better TOML](https://marketplace.visualstudio.com/items?itemName=tamasfe.even-better-toml)
 * [Python Indent](https://marketplace.visualstudio.com/items?itemName=KevinRose.vsc-python-indent)
+
+
+## Inštalácia balíkov do Python-u
+
+```bash
+$ poetry add --group dev httpie pytest black
+```
