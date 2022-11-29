@@ -111,3 +111,4 @@ reports/
 data/
 report.html
 .dockerignore
+.env

@@ -12,7 +12,7 @@
 * Poetry is a tool for dependency management and packaging in Python. It allows you to declare the libraries your project depends on and it will manage (install/update) them for you.
 
 
-## Installation
+## Poetry Installation
 
 ak nemate systemovy balickovaci system, tak balik nainstalujete prikazom `pip`:
 
@@ -28,25 +28,6 @@ $ poetry completions bash > /etc/bash_completion.d/poetry.bash-completion
 ```
 
 
-## Vytvorenie projektu
-
-Vytvorime prazdny projekt v IDE PyCharm, ktory bude typu _Pure Python_. Nastavime:
-
-* nazov projektu na `fishare_project`
-* cestu k projektu
-* z moznosti interpreterov vyberieme volbu _Virtual Environment_
-* nezaklikneme vytvorenie suboru `main.py`
-
-Projekt sa vytvori automaticky a bude prazdny. To je pre nas odrazovy mostik na vytvorenie vlastnej kostry projektu.
-
-**Poznamka:** Projekt sme nevytvarali pomocou nastroja `poetry` kvoli tomu, ze rozlicni ludia maju rozlicne prostredia, resp. rozlicne nakonfigurovane prostredie. Preto vytvorime prazdny projekt, nasledne nainstalujeme `poetry` a upravime nastavenia projektu, aby ho pouzival.
-
-
-## Poetry Installation
-
-najprv do nasho prostredia nainstalujeme balik `poetry`. to mozeme spravit cez `File` > `Settings` > `Project: fishare` > `Python Interpreter`
-
-
 ## Inicializacia projektu pomocou `poetry`
 
 v domovskom priecinku projektu inicializujeme projekt pomocou `poetry` prikazom
@@ -55,7 +36,9 @@ v domovskom priecinku projektu inicializujeme projekt pomocou `poetry` prikazom
 $ poetry init
 ```
 
-nasledne sa spusti sprievodca, pomocou ktoreho nastavime metaudaje projektu.
+nasledne sa spusti sprievodca, pomocou ktoreho nastavime metaudaje projektu. vysledkom inicializacie bude vytvorenie suboru `pyproject.toml`.
+
+**Poznamka:** V prvom kroku sa nastroj `poetry` bude pytat na nazov balicku. Nazov balicku nie je nazvom projektu! Pre uvedenie nazvu balicku preto pouzivajte len male pismena bez medzier.
 
 nasledne vytvorime zakladnu kostru projektu, ktora bude vyzerat takto:
 
@@ -106,16 +89,28 @@ $ poetry add --group dev ipython
 ```
 
 
-### Windowsaci a proxy
 
-treba nastavit proxy:
 
-```bash
-$ set HTTP_PROXY=http://127.0.0.1:3128
-$ set HTTPS_PROXY=%HTTP_PROXY%
-```
 
-a potom pofici aj `pip3`
+<!--
+## Vytvorenie projektu
+
+Vytvorime prazdny projekt v IDE PyCharm, ktory bude typu _Pure Python_. Nastavime:
+
+* nazov projektu na `fishare_project`
+* cestu k projektu
+* z moznosti interpreterov vyberieme volbu _Virtual Environment_
+* nezaklikneme vytvorenie suboru `main.py`
+
+Projekt sa vytvori automaticky a bude prazdny. To je pre nas odrazovy mostik na vytvorenie vlastnej kostry projektu.
+
+**Poznamka:** Projekt sme nevytvarali pomocou nastroja `poetry` kvoli tomu, ze rozlicni ludia maju rozlicne prostredia, resp. rozlicne nakonfigurovane prostredie. Preto vytvorime prazdny projekt, nasledne nainstalujeme `poetry` a upravime nastavenia projektu, aby ho pouzival.
+
+
+## Poetry Installation
+
+najprv do nasho prostredia nainstalujeme balik `poetry`. to mozeme spravit cez `File` > `Settings` > `Project: fishare` > `Python Interpreter`
+-->
 
 
 ## Rozšírenia pre Visual Studio Code

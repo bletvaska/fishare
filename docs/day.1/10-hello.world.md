@@ -38,22 +38,50 @@ if __name__ == '__main__':
 ```
 
 
-## Running the App from CLI
+## Nastavenie spravneho interpretera
 
-a nasledne mozeme aplikaciu spustit prikazom z korenoveho priecinku projektu
+Ak IDE nerozpoznava pouzite balicky (napr. podciarkuje priamo v importe balik `fastapi`), je potrebne zvolit spravny interpreter jazyka Python. Konkretne ten, ktory je pozity v prostredi vytvorenom pomocou nastroja `poetry`.
 
-```bash
-$ uvicorn fishare.main:app --reload
-```
+### Zistenie cesty interpretera jazyka Python
 
-alebo ako modul:
+zobrazime si zoznam virtualnych prostredi, ktore pre nas projekt existuju:
 
 ```bash
-$ python -m fishare.main
+$ poetry env list
+```
+
+informacie o aktualnom prostredi spolu s cestou veducou k interpreteru, ziskate prikazom
+
+```bash
+$ poetry env info
+```
+
+v pripade, ze sa nezobrazi ziadne virtualne prostredie, je potrebne ho vytvorit. to je mozne napriklad spustenim shell-u:
+
+```bash
+$ poetry shell
+```
+
+nasledne je potrebne nainstalovat vsetky balicky prikazom:
+
+```bash
+$ poetry install
 ```
 
 
-## Python Project Interpreter Update
+### Visual Studio Code
+
+v pravom dolnom rohu treba kliknut na oznacenie interpreteru jazyka Python a nasledne zvolit cestu veducu k prostrediu, ktore bolo vytvorene pomocou nastroja `poetry`. ak nie je uvedena v zozname, tak treba zvolit polozku na pridanie cesty `+ Enter interpreter path...`.
+
+rovnaku ponuku vieme zobrazit cez `Command Palette...` a zadanim polozky `Python: Select Interpreter`.
+
+ak sme vybrali interpreter spravne, nezname balicky prestanu byt podciarknute a rovnako tak zacne fungovat aj automaticke doplnovanie kodu.
+
+
+### PyCharm
+
+<!--
+#### Python Project Interpreter Update
 
 Aktualne sa bude PyCharm stazovat na to, ze nepozna jednotlive moduly, ktore pouzivame a vela veci v nasom kode bude podciarknutych cervenou farbou. to je preto, ze o virtualne prostredie sa momentalne stara `poetry` a _PyCharm_ o tom nevie. aktualizujeme teda nastavenia interpretra:
 
@@ -63,7 +91,7 @@ Aktualne sa bude PyCharm stazovat na to, ze nepozna jednotlive moduly, ktore pou
 4. zo zoznamu vlavo najprv vyberieme `Poetry Environment` a zo zoznamu `Existing environment` vyberieme interpreter nasho projektu
 
 
-## Nastavenie spustania projektu v Pycharm-e
+#### Nastavenie spustania projektu v Pycharm-e
 
 mame v podstate dva sposoby:
 
@@ -74,53 +102,4 @@ mame v podstate dva sposoby:
     * module name - `fishare.main`
     * interpereter - poetry set
     * nastavit workdir na korenovy priecinok projektu
-
-
-## Running with Visual Studio Code
-
-mozem pridat spustac priamo pre FastAPI, ktoremu VS Code rozumie. vysledok bude vyzerat takto:
-
-```json
-{
-    "version": "0.2.0",
-    "configurations": [
-        {
-            "name": "Python: FastAPI",
-            "type": "python",
-            "request": "launch",
-            "module": "uvicorn",
-            "args": [
-                "fishare.main:app"
-            ],
-            "jinja": true,
-            "justMyCode": true
-        }
-    ]
-}
-```
-
-alebo univerzalne mozeme vytvorit spustac pre Python modul:
-
-```json
-{
-    "version": "0.2.0",
-    "configurations": [
-        {
-            "name": "Python: Module",
-            "type": "python",
-            "request": "launch",
-            "module": "fishare.main",
-            "justMyCode": true
-        }
-    ]
-}
-```
-
-## Refactoring with module `__main__.py`
-
-
-## API Docs
-
-FastAPI generuje priamo aj Swagger dokumentaciu, ktora sa da najst na adrese [http://127.0.0.1:8000/docs]
-
-Okrem toho generuje aj Redoc dokumentaciu na adrese [http://127.0.0.1:8000/redoc]
+-->

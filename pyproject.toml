@@ -19,3 +19,6 @@ black = "^22.10.0"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+fishare = "fishare.main:main"  # python - m fishare.main
