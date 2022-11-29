@@ -1,5 +1,6 @@
-from datetime import datetime
-from pydantic import BaseModel, HttpUrl
+from datetime import datetime, timedelta
+import secrets
+from pydantic import BaseModel, HttpUrl, validator
 
 
 class File(BaseModel):
@@ -14,3 +15,22 @@ class File(BaseModel):
     mime_type: str = 'application/octet-stream'
     created_at: datetime | None = None
     updated_at: datetime | None = None
+
+    @validator('mime_type')
+    def mime_type_must_contain_slash(cls, v):
+        if '/' not in v:
+            raise ValueError('must contain "/"')
+        else:
+            return v.lower()
+
+    @validator('created_at', always=True)
+    def set_created_at_to_now(cls, v):
+        return datetime.now()
+
+    @validator('slug', always=True)
+    def set_secret_slug(cls, v):
+        return secrets.token_urlsafe(5)
+
+    @validator('expires', always=True)
+    def set_expiration_for_one_day(cls, v):
+        return datetime.now() + timedelta(days=1)
