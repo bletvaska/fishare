@@ -7,4 +7,3 @@
 * [Running App](day.1/15-running.app.md)
 * [API Docs](day.1/20-api.docs.md)
 * [Application URL Schema](day.1/25-url.scheme.md)
-

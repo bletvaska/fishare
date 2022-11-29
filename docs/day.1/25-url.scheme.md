@@ -19,6 +19,7 @@ nase REST API bude pouzivat prefix `/api/v1/`
 ### Resource Files
 
 | path            | method   | meaning                              | status    |
+|-----------------|----------|--------------------------------------|-----------|
 | `/{slug}`       | `GET`    | download file with given `slug`      | `200`     |
 | `/files/{slug}` | `GET`    | get file info as JSON document       | `200`     |
 | `/files/{slug}` | `DELETE` | delete file with given `slug`        | `200`, `204`  |
@@ -31,6 +32,7 @@ nase REST API bude pouzivat prefix `/api/v1/`
 ### Resource Users
 
 | path            | method   | meaning |
+|-----------------|----------|---------|
 | `/users/`       | `GET`    | retrieve list of users |
 | `/users/{slug}` | `GET`    | retrieve info about given user |
 | `/users/`       | `POST`   | create new user |
@@ -41,5 +43,6 @@ nase REST API bude pouzivat prefix `/api/v1/`
 ### Others
 
 | path            | method | meaning |
+|-----------------|--------|---------|
 | `/`             | `GET`  | show homepage |
 | `/cron/`        | `GET`  | starts maintainance |
