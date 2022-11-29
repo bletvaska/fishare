@@ -1,7 +1,10 @@
 from fastapi import FastAPI
 import uvicorn
 
+from fishare.api.v1 import files
+
 app = FastAPI()
+app.include_router(files.router)
 
 
 @app.get("/")
@@ -20,3 +23,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
