@@ -2,6 +2,10 @@ from datetime import datetime, timedelta
 import secrets
 from pydantic import BaseModel, HttpUrl, validator
 
+from .settings import get_settings
+
+
+settings = get_settings()
 
 class File(BaseModel):
     # id: int
@@ -29,7 +33,7 @@ class File(BaseModel):
 
     @validator('slug', always=True)
     def set_secret_slug(cls, v):
-        return secrets.token_urlsafe(5)
+        return secrets.token_urlsafe(settings.slug_length)
 
     @validator('expires', always=True)
     def set_expiration_for_one_day(cls, v):
