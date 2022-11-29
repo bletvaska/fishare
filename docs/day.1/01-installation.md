@@ -126,3 +126,4 @@ a potom pofici aj `pip3`
 * [Pylance](https://marketplace.visualstudio.com/items?itemName=ms-python.vscode-pylance)
 * [SQLite](https://marketplace.visualstudio.com/items?itemName=alexcvzz.vscode-sqlite)
 * [Even Better TOML](https://marketplace.visualstudio.com/items?itemName=tamasfe.even-better-toml)
+* [Python Indent](https://marketplace.visualstudio.com/items?itemName=KevinRose.vsc-python-indent)
