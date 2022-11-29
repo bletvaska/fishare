@@ -1,10 +1,10 @@
 from fastapi import FastAPI
 import uvicorn
 
-from fishare.api.v1 import files
+from .api.v1 import files
 
 app = FastAPI()
-app.include_router(files.router)
+app.include_router(files.router, prefix=files.PATH_PREFIX)
 
 
 @app.get("/")
