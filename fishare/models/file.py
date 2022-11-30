@@ -46,6 +46,7 @@ class File(SQLModel, table=True, validate=True):
     def filename_cant_be_empty(cls, v):
         if v == "":
             raise ValueError("can't be empty")
+        return v
 
 
 class FileAdmin(ModelView, model=File):
