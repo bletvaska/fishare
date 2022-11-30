@@ -1,6 +1,8 @@
 from datetime import datetime
 from pydantic import BaseModel, HttpUrl, validator
 
+from fishare.dependencies import get_settings
+
 
 class FileDetailsOut(BaseModel):
     slug: str
@@ -12,4 +14,4 @@ class FileDetailsOut(BaseModel):
     @validator('url', always=True)
     def set_url_for_download(cls, value, values):
         slug = values['slug']
-        return f'http://localhost:9000/{slug}'
+        return f'{get_settings().base_url}/{slug}'

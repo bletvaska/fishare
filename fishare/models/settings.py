@@ -1,4 +1,4 @@
-from pydantic import BaseSettings, DirectoryPath
+from pydantic import AnyHttpUrl, BaseSettings, DirectoryPath
 
 
 class Settings(BaseSettings):
@@ -6,6 +6,7 @@ class Settings(BaseSettings):
     db_uri: str = "sqlite:///db.sqlite"
     slug_length = 5
     storage: DirectoryPath = 'storage/'
+    base_url: AnyHttpUrl = 'https://6adf-88-212-39-249.eu.ngrok.io'
 
     class Config:
         env_file = ".env"
