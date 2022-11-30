@@ -5,6 +5,7 @@ from sqlmodel import Session
 from fishare.dependencies import get_session, get_settings
 
 from fishare.models.file_details import FileDetails
+from fishare.models.file_details_out import FileDetailsOut
 from fishare.models.settings import Settings
 
 PATH_PREFIX = "/api/v1/files"
@@ -31,7 +32,7 @@ def get_file_detail(slug: int):
 
 # http -f post http://localhost:9000/api/v1/files/ max_downloads=10 payload@README.md
 
-@router.post("/", status_code=201)
+@router.post("/", status_code=201, response_model=FileDetailsOut)
 def create_file(payload: UploadFile = fastapi.File(...),
                 max_downloads: int = Form(None),
                 settings: Settings = Depends(get_settings),
@@ -58,4 +59,5 @@ def create_file(payload: UploadFile = fastapi.File(...),
     session.commit()
     session.refresh(file)
 
+    # return FileDetailsOut(**file.dict())
     return file
