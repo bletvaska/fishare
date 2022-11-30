@@ -1,6 +1,6 @@
 from pydantic import ValidationError
 import pytest
-from fishare.models.file import File
+from fishare.models.file_details import File
 
 pytestmark = [pytest.mark.models, pytest.mark.file]
 

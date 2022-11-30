@@ -4,7 +4,7 @@ import fastapi
 from sqlmodel import Session
 from fishare.dependencies import get_session, get_settings
 
-from fishare.models.file import File
+from fishare.models.file_details import FileDetails
 from fishare.models.settings import Settings
 
 PATH_PREFIX = "/api/v1/files"
@@ -37,7 +37,7 @@ def create_file(payload: UploadFile = fastapi.File(...),
                 settings: Settings = Depends(get_settings),
                 session: Session = Depends(get_session)):
     # create file object
-    file = File(
+    file = FileDetails(
         filename=payload.filename,
         size=-1,
         mime_type=payload.content_type,

@@ -8,7 +8,7 @@ from sqlmodel import Field, SQLModel
 from fishare.dependencies import get_settings
 
 
-class File(SQLModel, table=True, validate=True):
+class FileDetails(SQLModel, table=True, validate=True):
     id: int | None = Field(default=None, primary_key=True)
     slug: str | None = None
     filename: str
@@ -47,11 +47,11 @@ class File(SQLModel, table=True, validate=True):
         return v
 
 
-class FileAdmin(ModelView, model=File):
+class FileAdmin(ModelView, model=FileDetails):
     column_list = [
-        File.filename,
-        File.slug,
-        File.size,
-        File.downloads,
-        File.max_downloads,
+        FileDetails.filename,
+        FileDetails.slug,
+        FileDetails.size,
+        FileDetails.downloads,
+        FileDetails.max_downloads,
     ]

@@ -5,7 +5,7 @@ import uvicorn
 
 
 from .dependencies import get_settings
-from .models.file import FileAdmin
+from .models.file_details import FileAdmin
 from .api.v1 import files
 
 # create app and set routers
