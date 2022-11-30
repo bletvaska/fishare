@@ -1,10 +1,11 @@
-from pydantic import BaseSettings
+from pydantic import BaseSettings, DirectoryPath
 
 
 class Settings(BaseSettings):
     environment = "production"
     db_uri: str = "sqlite:///db.sqlite"
     slug_length = 5
+    storage: DirectoryPath = 'storage/'
 
     class Config:
         env_file = ".env"

@@ -1,3 +1,4 @@
+import shutil
 from fastapi import Depends, Form, UploadFile
 import fastapi
 from sqlmodel import Session, create_engine
@@ -31,14 +32,21 @@ def get_file_detail(slug: int):
 @router.post("/", status_code=201)
 def create_file(payload: UploadFile = fastapi.File(...),
                 max_downloads: int = Form(None),
-                # settings: Settings = Depends(get_settings),
+                settings: Settings = Depends(get_settings),
                 session: Session = Depends(get_session)):
+    # create file object
     file = File(
         filename=payload.filename,
         size=-1,
         mime_type=payload.content_type,
         max_downloads=1 if max_downloads is None else max_downloads
     )
+
+    # save payload to file
+    path = settings.storage / file.slug
+
+    with open(path, 'wb') as dest:
+        shutil.copyfileobj(payload.file, dest)
 
     # insert to db
     session.add(file)
