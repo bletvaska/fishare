@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 import secrets
 
-from pydantic import HttpUrl, validator
+from pydantic import validator
 from sqladmin import ModelView
 from sqlmodel import Field, SQLModel
 
@@ -12,7 +12,6 @@ class FileDetails(SQLModel, table=True, validate=True):
     id: int | None = Field(default=None, primary_key=True)
     slug: str | None = None
     filename: str
-    url: HttpUrl | None = None
     expires: datetime | None = None
     downloads = 0
     max_downloads = 1

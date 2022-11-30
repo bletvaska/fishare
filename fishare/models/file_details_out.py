@@ -1,5 +1,5 @@
 from datetime import datetime
-from pydantic import BaseModel, HttpUrl
+from pydantic import BaseModel, HttpUrl, validator
 
 
 class FileDetailsOut(BaseModel):
@@ -8,3 +8,8 @@ class FileDetailsOut(BaseModel):
     url: HttpUrl = None
     expires: datetime | None = None
     created_at: datetime | None = None
+
+    @validator('url', always=True)
+    def set_url_for_download(cls, value, values):
+        slug = values['slug']
+        return f'http://localhost:9000/{slug}'
