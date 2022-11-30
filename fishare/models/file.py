@@ -10,7 +10,7 @@ from sqlmodel import Field, SQLModel
 settings = get_settings()
 
 
-class File(SQLModel, table=True):
+class File(SQLModel, table=True, validate=True):
     id: int | None = Field(default=None, primary_key=True)
     slug: str | None = None
     filename: str
@@ -49,4 +49,10 @@ class File(SQLModel, table=True):
 
 
 class FileAdmin(ModelView, model=File):
-    column_list = [File.filename, File.slug, File.size]
+    column_list = [
+        File.filename,
+        File.slug,
+        File.size,
+        File.downloads,
+        File.max_downloads
+    ]
