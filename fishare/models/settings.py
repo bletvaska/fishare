@@ -4,6 +4,7 @@ from pydantic import BaseSettings
 
 class Settings(BaseSettings):
     environment = "production"
+    db_uri: str = "sqlite:///db.sqlite"
     slug_length = 5
 
     class Config:
