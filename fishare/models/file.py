@@ -3,8 +3,9 @@ import secrets
 from pydantic import HttpUrl, validator
 from sqladmin import ModelView
 
-from .settings import get_settings
 from sqlmodel import Field, SQLModel
+
+from fishare.dependencies import get_settings
 
 
 settings = get_settings()
