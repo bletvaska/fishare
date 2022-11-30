@@ -1,14 +1,11 @@
 from datetime import datetime, timedelta
 import secrets
+
 from pydantic import HttpUrl, validator
 from sqladmin import ModelView
-
 from sqlmodel import Field, SQLModel
 
 from fishare.dependencies import get_settings
-
-
-settings = get_settings()
 
 
 class File(SQLModel, table=True, validate=True):
@@ -37,7 +34,7 @@ class File(SQLModel, table=True, validate=True):
 
     @validator("slug", always=True)
     def set_secret_slug(cls, v):
-        return secrets.token_urlsafe(settings.slug_length)
+        return secrets.token_urlsafe(get_settings().slug_length)
 
     @validator("expires", always=True)
     def set_expiration_for_one_day(cls, v):
@@ -56,5 +53,5 @@ class FileAdmin(ModelView, model=File):
         File.slug,
         File.size,
         File.downloads,
-        File.max_downloads
+        File.max_downloads,
     ]

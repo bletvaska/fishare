@@ -3,8 +3,9 @@ from sqladmin import Admin
 from sqlmodel import SQLModel, create_engine
 import uvicorn
 
+
+from .dependencies import get_settings
 from .models.file import FileAdmin
-from .models.settings import Settings
 from .api.v1 import files
 
 # create app and set routers
@@ -12,8 +13,7 @@ app = FastAPI()
 app.include_router(files.router, prefix=files.PATH_PREFIX)
 
 # init db
-settings = Settings()
-engine = create_engine(settings.db_uri)
+engine = create_engine(get_settings().db_uri)
 SQLModel.metadata.create_all(engine)
 
 # admin view
