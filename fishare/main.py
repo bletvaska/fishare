@@ -3,6 +3,8 @@ from sqladmin import Admin
 from sqlmodel import SQLModel, create_engine
 import uvicorn
 
+from fishare.api.v1 import download
+
 
 from .dependencies import get_settings
 from .models.file_details import FileAdmin
@@ -11,6 +13,7 @@ from .api.v1 import files
 # create app and set routers
 app = FastAPI()
 app.include_router(files.router, prefix=files.PATH_PREFIX)
+app.include_router(download.router)
 
 # init db
 engine = create_engine(get_settings().db_uri)
