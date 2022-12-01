@@ -1,11 +1,13 @@
 from datetime import datetime
 import shutil
+
 import fastapi
 from fastapi import Depends, Form, UploadFile
 from sqlmodel import Session, select
+from sqlalchemy.exc import NoResultFound
+
 from fishare.core import ProblemDetailsResponse
 from fishare.dependencies import get_session, get_settings
-
 from fishare.models.file_details import FileDetails
 from fishare.models.file_details_out import FileDetailsOut
 from fishare.models.problem_details import ProblemDetails
@@ -39,7 +41,7 @@ def get_file_detail(slug: str, session: Session = Depends(get_session)):
     # get file
     file = session.exec(statement).one_or_none()
 
-    # handle result
+    # if not found, then 404
     if file is None:
         problem = ProblemDetails(
             title="File not found",
@@ -52,7 +54,40 @@ def get_file_detail(slug: str, session: Session = Depends(get_session)):
             status_code=problem.status, content=problem.dict()
         )
 
+    # return file
     return file
+
+
+@router.delete('/{slug}', status_code=204)
+def delete_file(slug: str, session: Session = Depends(get_session)):
+    try:
+        # prepare statement
+        # SELECT * FROM files WHERE slug=slug AND downloads < max_downloads AND now() < expires;
+        statement = (
+            select(FileDetails)
+            .where(FileDetails.slug == slug)
+            .where(FileDetails.downloads < FileDetails.max_downloads)
+            .where(datetime.now() < FileDetails.expires)
+        )
+
+        # exec
+        file = session.exec(statement).one()
+
+        # delete file object
+        session.delete(file)
+        session.commit()
+
+    except NoResultFound as ex:
+        problem = ProblemDetails(
+            title="File not found",
+            detail=f"File with slug '{slug}' was not found.",
+            instance=f"/files/{slug}",
+            status=404,
+        )
+
+        return ProblemDetailsResponse(
+            status_code=problem.status, content=problem.dict()
+        )
 
 
 # curl \
