@@ -12,6 +12,7 @@ from fishare.core import ProblemDetailsResponse
 from fishare.dependencies import get_session, get_settings
 from fishare.models.file_details import FileDetails
 from fishare.models.file_details_out import FileDetailsOut
+from fishare.models.pager import Pager
 from fishare.models.problem_details import ProblemDetails
 from fishare.models.settings import Settings
 
@@ -20,10 +21,12 @@ PATH_PREFIX = "/api/v1/files"
 router = fastapi.APIRouter()
 
 
-@router.get("")
+@router.get("", response_model=Pager)
 def get_list_of_files(
-    page: int = 1, size: int = 5, session: Session = Depends(get_session)
+    page: int = 1, size: int = 3, session: Session = Depends(get_session)
 ):
+    pager = Pager()
+
     # SELECT * FROM filedetails
     # WHERE downloads < max_downloads
     # AND now() < expires
@@ -36,11 +39,9 @@ def get_list_of_files(
         .limit(size)
     )
 
-    files = session.exec(statement).all()
-    result = []
-    for file in files:
-        result.append(FileDetailsOut(**file.dict()))
-    return result
+    pager.results = session.exec(statement).all()
+
+    return pager
 
 
 @router.get("/{slug}", response_model=FileDetailsOut)
