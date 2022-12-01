@@ -14,8 +14,9 @@ from fishare.models.settings import Settings
 router = fastapi.APIRouter()
 
 
+@router.head('/{slug}')
 @router.get("/{slug}", status_code=200)
-def download_file(
+def download_file(request: fastapi.Request,
     slug: str,
     session: Session = fastapi.Depends(get_session),
     settings: Settings = fastapi.Depends(get_settings),
@@ -33,9 +34,10 @@ def download_file(
         file = session.exec(statement).one()
 
         # update file downloads
-        file.downloads += 1
-        session.commit()
-        session.refresh(file)
+        if request.method == 'GET':
+            file.downloads += 1
+            session.commit()
+            session.refresh(file)
 
         # return file
         return FileResponse(
