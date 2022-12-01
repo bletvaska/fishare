@@ -6,7 +6,8 @@ class Settings(BaseSettings):
     db_uri: str = "sqlite:///db.sqlite"
     slug_length = 5
     storage: DirectoryPath = 'storage/'
-    base_url: AnyHttpUrl = 'https://6adf-88-212-39-249.eu.ngrok.io'
+    # base_url: AnyHttpUrl = 'https://7aa6-88-212-39-249.eu.ngrok.io'
+    base_url: AnyHttpUrl = 'http://localhost:9000'
 
     class Config:
         env_file = ".env"

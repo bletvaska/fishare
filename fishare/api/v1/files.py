@@ -23,12 +23,17 @@ router = fastapi.APIRouter()
 
 @router.get("", response_model=Pager)
 def get_list_of_files(
-    page: int = 1, size: int = 3, session: Session = Depends(get_session)
+    page: int = 1,
+    size: int = 10,
+    session: Session = Depends(get_session),
+    settings: Settings = Depends(get_settings),
 ):
+    url = f'{settings.base_url}{PATH_PREFIX}'
     pager = Pager()
 
     # count nr of records/files
-    pager.count = (session.query(FileDetails)
+    pager.count = (
+        session.query(FileDetails)
         .where(FileDetails.downloads < FileDetails.max_downloads)
         .where(datetime.now() < FileDetails.expires)
         .count()
@@ -48,6 +53,18 @@ def get_list_of_files(
     )
 
     pager.results = session.exec(statement).all()
+
+    # create links for first and last page
+    pager.first = f"{url}?size={size}"
+    pager.last = f"{url}?size={size}&page={pager.count // size + 1}"
+
+    # next page
+    if page + 1 <= pager.count // size + 1:
+        pager.next = f'{url}?size={size}&page={page + 1}'
+
+    # previous page
+    if page - 1 > 0:
+        pager.previous = f'{url}?size={size}&page={page - 1}'
 
     return pager
 
