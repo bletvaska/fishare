@@ -59,8 +59,12 @@ def get_file_detail(slug: str, session: Session = Depends(get_session)):
     return file
 
 
-@router.delete('/{slug}', status_code=204)
-def delete_file(slug: str, session: Session = Depends(get_session), settings: Settings = Depends(get_settings)):
+@router.delete("/{slug}", status_code=204)
+def delete_file(
+    slug: str,
+    session: Session = Depends(get_session),
+    settings: Settings = Depends(get_settings),
+):
     try:
         # prepare statement
         # f'SELECT * FROM files WHERE slug={slug} AND downloads < max_downloads AND now() < expires';
@@ -76,11 +80,63 @@ def delete_file(slug: str, session: Session = Depends(get_session), settings: Se
 
         # delete from storage
         path = settings.storage / file.slug
-        path.unlink(missing_ok=True)
+        path.unlink(missing_ok=True)  # FIXME maybe need some rework. maybe not.
 
         # delete file object
         session.delete(file)
         session.commit()
+
+    except NoResultFound as ex:
+        problem = ProblemDetails(
+            title="File not found",
+            detail=f"File with slug '{slug}' was not found.",
+            instance=f"/files/{slug}",
+            status=404,
+        )
+
+        return ProblemDetailsResponse(
+            status_code=problem.status, content=problem.dict()
+        )
+
+
+@router.put("/{slug}", status_code=200, response_model=FileDetailsOut)
+def full_file_update(
+    slug: str,
+    payload: UploadFile = fastapi.File(...),
+    max_downloads: int = Form(),
+    settings: Settings = Depends(get_settings),
+    session: Session = Depends(get_session),
+):
+    try:
+        # select given file
+        # f'SELECT * FROM files WHERE slug={slug} AND downloads < max_downloads AND now() < expires';
+        statement = (
+            select(FileDetails)
+            .where(FileDetails.slug == slug)
+            .where(FileDetails.downloads < FileDetails.max_downloads)
+            .where(datetime.now() < FileDetails.expires)
+        )
+
+        file = session.exec(statement).one()
+
+        # overwrite file with uploaded one
+        path = settings.storage / file.slug
+        with open(path, "wb") as dest:
+            shutil.copyfileobj(payload.file, dest)
+
+        # update file fields
+        file.filename = payload.filename
+        file.size = path.stat().st_size
+        file.max_downloads = max_downloads
+        file.updated_at = datetime.now()
+
+        # update in db
+        session.add(file)
+        session.commit()
+        session.refresh(file)
+
+        # return
+        return file
 
     except NoResultFound as ex:
         problem = ProblemDetails(
