@@ -1,7 +1,8 @@
 import shutil
+from typing import List
 from fastapi import Depends, Form, UploadFile
 import fastapi
-from sqlmodel import Session
+from sqlmodel import Session, select
 from fishare.dependencies import get_session, get_settings
 
 from fishare.models.file_details import FileDetails
@@ -12,17 +13,22 @@ PATH_PREFIX = "/api/v1/files"
 
 router = fastapi.APIRouter()
 
-files = ["main.py", "obrazok.jpg", "batman.avi", "superman.asf"]
+# files = ["main.py", "obrazok.jpg", "batman.avi", "superman.asf"]
 
 
 @router.get("/")
-def get_list_of_files():
-    return files
+def get_list_of_files(session: Session = Depends(get_session)):
+    statement = select(FileDetails)
+    files = session.exec(statement).all()
+    result = []
+    for file in files:
+        result.append(FileDetailsOut(**file.dict()))
+    return result
 
 
-@router.get("/{slug}")
-def get_file_detail(slug: int):
-    return files[slug - 1]
+# @router.get("/{slug}")
+# def get_file_detail(slug: int):
+#     return files[slug - 1]
 
 
 # curl \
