@@ -1,7 +1,8 @@
+from datetime import datetime
 import shutil
-from typing import List
-from fastapi import Depends, Form, UploadFile
 import fastapi
+from fastapi import Depends, Form, UploadFile
+from fastapi.responses import JSONResponse
 from sqlmodel import Session, select
 from fishare.dependencies import get_session, get_settings
 
@@ -12,8 +13,6 @@ from fishare.models.settings import Settings
 PATH_PREFIX = "/api/v1/files"
 
 router = fastapi.APIRouter()
-
-# files = ["main.py", "obrazok.jpg", "batman.avi", "superman.asf"]
 
 
 @router.get("/")
@@ -26,9 +25,27 @@ def get_list_of_files(session: Session = Depends(get_session)):
     return result
 
 
-# @router.get("/{slug}")
-# def get_file_detail(slug: int):
-#     return files[slug - 1]
+@router.get("/{slug}", response_model=FileDetailsOut)
+def get_file_detail(slug: str, session: Session = Depends(get_session)):
+    # SELECT * FROM files WHERE slug=slug AND downloads < max_downloads AND now() < expires;
+    statement = (
+        select(FileDetails)
+        .where(FileDetails.slug == slug)
+        .where(FileDetails.downloads < FileDetails.max_downloads)
+        .where(datetime.now() < FileDetails.expires)
+    )
+
+    # get file
+    file = session.exec(statement).one_or_none()
+
+    # handle result
+    if file is None:
+        return JSONResponse(
+            status_code=404,
+            content={"message": "Ta som nenasiel take, co si kcel."}
+            )
+
+    return file
 
 
 # curl \
@@ -38,23 +55,26 @@ def get_list_of_files(session: Session = Depends(get_session)):
 
 # http -f post http://localhost:9000/api/v1/files/ max_downloads=10 payload@README.md
 
+
 @router.post("/", status_code=201, response_model=FileDetailsOut)
-def create_file(payload: UploadFile = fastapi.File(...),
-                max_downloads: int = Form(None),
-                settings: Settings = Depends(get_settings),
-                session: Session = Depends(get_session)):
+def create_file(
+    payload: UploadFile = fastapi.File(...),
+    max_downloads: int = Form(None),
+    settings: Settings = Depends(get_settings),
+    session: Session = Depends(get_session),
+):
     # create file object
     file = FileDetails(
         filename=payload.filename,
         size=-1,
         mime_type=payload.content_type,
-        max_downloads=1 if max_downloads is None else max_downloads
+        max_downloads=1 if max_downloads is None else max_downloads,
     )
 
     # save payload to file
     path = settings.storage / file.slug
 
-    with open(path, 'wb') as dest:
+    with open(path, "wb") as dest:
         shutil.copyfileobj(payload.file, dest)
 
     # get file size
