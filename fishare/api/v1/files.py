@@ -27,6 +27,14 @@ def get_list_of_files(
 ):
     pager = Pager()
 
+    # count nr of records/files
+    pager.count = (session.query(FileDetails)
+        .where(FileDetails.downloads < FileDetails.max_downloads)
+        .where(datetime.now() < FileDetails.expires)
+        .count()
+    )
+
+    # select results from db
     # SELECT * FROM filedetails
     # WHERE downloads < max_downloads
     # AND now() < expires
