@@ -1,4 +1,5 @@
 from datetime import datetime
+import mimetypes
 from pathlib import Path
 import shutil
 
@@ -107,6 +108,7 @@ def full_file_update(
     settings: Settings = Depends(get_settings),
     session: Session = Depends(get_session),
 ):
+
     try:
         # select given file
         # f'SELECT * FROM files WHERE slug={slug} AND downloads < max_downloads AND now() < expires';
@@ -128,6 +130,68 @@ def full_file_update(
         file.filename = payload.filename
         file.size = path.stat().st_size
         file.max_downloads = max_downloads
+        file.mime_type = mimetypes.guess_type(file.filename)[0]
+        file.updated_at = datetime.now()
+        # file.mime_type=payload.content_type
+
+        # update in db
+        session.add(file)
+        session.commit()
+        session.refresh(file)
+
+        # return
+        return file
+
+    except NoResultFound as ex:
+        problem = ProblemDetails(
+            title="File not found",
+            detail=f"File with slug '{slug}' was not found.",
+            instance=f"/files/{slug}",
+            status=404,
+        )
+
+        return ProblemDetailsResponse(
+            status_code=problem.status, content=problem.dict()
+        )
+
+
+@router.patch("/{slug}", status_code=200, response_model=FileDetailsOut)
+def partial_file_update(
+    slug: str,
+    payload: UploadFile = fastapi.File(None),
+    max_downloads: int = Form(None),
+    settings: Settings = Depends(get_settings),
+    session: Session = Depends(get_session),
+):
+
+    try:
+        # select given file
+        # f'SELECT * FROM files WHERE slug={slug} AND downloads < max_downloads AND now() < expires';
+        statement = (
+            select(FileDetails)
+            .where(FileDetails.slug == slug)
+            .where(FileDetails.downloads < FileDetails.max_downloads)
+            .where(datetime.now() < FileDetails.expires)
+        )
+
+        file = session.exec(statement).one()
+
+        # overwrite file with uploaded one
+        if payload is not None:
+            path = settings.storage / file.slug
+            with open(path, "wb") as dest:
+                shutil.copyfileobj(payload.file, dest)
+
+            file.filename = payload.filename
+            file.size = path.stat().st_size
+            # file.mime_type = mimetypes.guess_type(file.filename)[0]
+            file.mime_type=payload.content_type
+
+        # update file fields
+        if max_downloads is not None:
+            file.max_downloads = max_downloads
+
+        # update timestamp
         file.updated_at = datetime.now()
 
         # update in db
