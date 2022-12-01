@@ -2,12 +2,13 @@ from datetime import datetime
 import shutil
 import fastapi
 from fastapi import Depends, Form, UploadFile
-from fastapi.responses import JSONResponse
 from sqlmodel import Session, select
+from fishare.core import ProblemDetailsResponse
 from fishare.dependencies import get_session, get_settings
 
 from fishare.models.file_details import FileDetails
 from fishare.models.file_details_out import FileDetailsOut
+from fishare.models.problem_details import ProblemDetails
 from fishare.models.settings import Settings
 
 PATH_PREFIX = "/api/v1/files"
@@ -40,10 +41,16 @@ def get_file_detail(slug: str, session: Session = Depends(get_session)):
 
     # handle result
     if file is None:
-        return JSONResponse(
-            status_code=404,
-            content={"message": "Ta som nenasiel take, co si kcel."}
-            )
+        problem = ProblemDetails(
+            title="File not found",
+            detail=f"File with slug '{slug}' was not found.",
+            instance="/files/",
+            status=404,
+        )
+
+        return ProblemDetailsResponse(
+            status_code=problem.status, content=problem.dict()
+        )
 
     return file
 
