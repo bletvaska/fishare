@@ -21,8 +21,21 @@ router = fastapi.APIRouter()
 
 
 @router.get("")
-def get_list_of_files(page: int = 1, size: int = 5, session: Session = Depends(get_session)):
-    statement = select(FileDetails)
+def get_list_of_files(
+    page: int = 1, size: int = 5, session: Session = Depends(get_session)
+):
+    # SELECT * FROM filedetails
+    # WHERE downloads < max_downloads
+    # AND now() < expires
+    # LIMIT ({page} - 1) * {size}, {size}
+    statement = (
+        select(FileDetails)
+        .where(FileDetails.downloads < FileDetails.max_downloads)
+        .where(datetime.now() < FileDetails.expires)
+        .offset((page - 1) * size)
+        .limit(size)
+    )
+
     files = session.exec(statement).all()
     result = []
     for file in files:
@@ -185,8 +198,7 @@ def partial_file_update(
 
             file.filename = payload.filename
             file.size = path.stat().st_size
-            file.mime_type=payload.content_type
-
+            file.mime_type = payload.content_type
 
         # update file fields
         if max_downloads is not None:
