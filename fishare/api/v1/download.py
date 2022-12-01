@@ -1,9 +1,10 @@
 from datetime import datetime
 import fastapi
+from fastapi.responses import FileResponse
 from sqlmodel import Session, select
 from sqlalchemy.exc import NoResultFound
-from fishare.core import ProblemDetailsResponse
 
+from fishare.core import ProblemDetailsResponse
 from fishare.dependencies import get_session, get_settings
 from fishare.models.file_details import FileDetails
 from fishare.models.problem_details import ProblemDetails
@@ -30,6 +31,19 @@ def download_file(
 
         # get file
         file = session.exec(statement).one()
+
+        # update file downloads
+        file.downloads += 1
+        session.commit()
+        session.refresh(file)
+
+        # return file
+        return FileResponse(
+            settings.storage / file.slug,  # path
+            filename=file.filename,  # filename
+            media_type=file.mime_type  # mime-type / content-type
+        )
+
 
     except NoResultFound as ex:
         problem = ProblemDetails(
