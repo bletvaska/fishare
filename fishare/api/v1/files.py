@@ -20,8 +20,8 @@ PATH_PREFIX = "/api/v1/files"
 router = fastapi.APIRouter()
 
 
-@router.get("/")
-def get_list_of_files(session: Session = Depends(get_session)):
+@router.get("")
+def get_list_of_files(page: int = 1, size: int = 5, session: Session = Depends(get_session)):
     statement = select(FileDetails)
     files = session.exec(statement).all()
     result = []
@@ -160,6 +160,7 @@ def partial_file_update(
     slug: str,
     payload: UploadFile = fastapi.File(None),
     max_downloads: int = Form(None),
+    filename: str = Form(None),
     settings: Settings = Depends(get_settings),
     session: Session = Depends(get_session),
 ):
@@ -184,12 +185,16 @@ def partial_file_update(
 
             file.filename = payload.filename
             file.size = path.stat().st_size
-            # file.mime_type = mimetypes.guess_type(file.filename)[0]
             file.mime_type=payload.content_type
+
 
         # update file fields
         if max_downloads is not None:
             file.max_downloads = max_downloads
+
+        if filename is not None:
+            file.filename = filename
+            file.mime_type = mimetypes.guess_type(file.filename)[0]
 
         # update timestamp
         file.updated_at = datetime.now()
