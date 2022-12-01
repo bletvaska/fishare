@@ -1,4 +1,5 @@
 from datetime import datetime
+from pathlib import Path
 import shutil
 
 import fastapi
@@ -59,10 +60,10 @@ def get_file_detail(slug: str, session: Session = Depends(get_session)):
 
 
 @router.delete('/{slug}', status_code=204)
-def delete_file(slug: str, session: Session = Depends(get_session)):
+def delete_file(slug: str, session: Session = Depends(get_session), settings: Settings = Depends(get_settings)):
     try:
         # prepare statement
-        # SELECT * FROM files WHERE slug=slug AND downloads < max_downloads AND now() < expires;
+        # f'SELECT * FROM files WHERE slug={slug} AND downloads < max_downloads AND now() < expires';
         statement = (
             select(FileDetails)
             .where(FileDetails.slug == slug)
@@ -72,6 +73,10 @@ def delete_file(slug: str, session: Session = Depends(get_session)):
 
         # exec
         file = session.exec(statement).one()
+
+        # delete from storage
+        path = settings.storage / file.slug
+        path.unlink(missing_ok=True)
 
         # delete file object
         session.delete(file)
