@@ -1,10 +1,12 @@
 from datetime import datetime
+from functools import wraps
 import mimetypes
 from pathlib import Path
 import shutil
 
 import fastapi
-from fastapi import Depends, Form, UploadFile
+from fastapi import Depends, Form, Request, UploadFile
+from loguru import logger
 from sqlmodel import Session, select
 from sqlalchemy.exc import NoResultFound
 
@@ -21,14 +23,27 @@ PATH_PREFIX = "/api/v1/files"
 router = fastapi.APIRouter()
 
 
+def log_client_ip(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        request = kwargs["request"]
+        logger.info(f"Incomming connection from {request.client.host}")
+        return func(*args, **kwargs)
+
+    return wrapper
+
+
+
+@log_client_ip
 @router.get("", response_model=Pager)
 def get_list_of_files(
+    request: Request,
     page: int = 1,
     size: int = 10,
     session: Session = Depends(get_session),
     settings: Settings = Depends(get_settings),
 ):
-    url = f'{settings.base_url}{PATH_PREFIX}'
+    url = f"{settings.base_url}{PATH_PREFIX}"
     pager = Pager()
 
     # count nr of records/files
@@ -60,15 +75,16 @@ def get_list_of_files(
 
     # next page
     if page + 1 <= pager.count // size + 1:
-        pager.next = f'{url}?size={size}&page={page + 1}'
+        pager.next = f"{url}?size={size}&page={page + 1}"
 
     # previous page
     if page - 1 > 0:
-        pager.previous = f'{url}?size={size}&page={page - 1}'
+        pager.previous = f"{url}?size={size}&page={page - 1}"
 
     return pager
 
 
+@log_client_ip
 @router.get("/{slug}", response_model=FileDetailsOut)
 def get_file_detail(slug: str, session: Session = Depends(get_session)):
     # SELECT * FROM files WHERE slug=slug AND downloads < max_downloads AND now() < expires;

@@ -1,12 +1,14 @@
 from datetime import datetime
 from pathlib import Path
 
-from fastapi import Depends, FastAPI
+from fastapi import Depends, FastAPI, Request
+from loguru import logger
 from sqladmin import Admin
 from sqlmodel import SQLModel, Session, create_engine, or_, select
 import uvicorn
 from starlette.staticfiles import StaticFiles
 from fastapi_utils.tasks import repeat_every
+from starlette.middleware.base import BaseHTTPMiddleware
 
 from fishare.models.settings import Settings
 
@@ -35,14 +37,22 @@ SQLModel.metadata.create_all(engine)
 admin = Admin(app, engine)
 admin.add_view(FileAdmin)
 
+# creating middleware
+async def log_client_ip_in_middleware(request: Request, call_next):
+    logger.info(f'Incomming connection from {request.client.host} in middleware.')
+    response = await call_next(request)
+    return response
+
+app.add_middleware(BaseHTTPMiddleware, dispatch=log_client_ip_in_middleware)
 
 def main():
     uvicorn.run("fishare.main:app", reload=True, host="0.0.0.0", port=9000)
 
 
 @app.on_event("startup")
-@repeat_every(seconds=10)
+@repeat_every(seconds=60 * 5)
 def cleanup():
+    logger.info('running cleanup')
     try:
         session = next(get_session())
         start = datetime.now()
