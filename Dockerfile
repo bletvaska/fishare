@@ -10,7 +10,12 @@ RUN pip install --upgrade pip \
     && rm /tmp/*whl \
     && pip cache purge \
     && mkdir -p /app/storage \
-    && chown -R appuser.appuser /app
+    && chown -R appuser.appuser /app \
+    && apt update && apt install -y curl \
+    && rm -rf /var/lib/apt/lists/*
+
+HEALTHCHECK --interval=10s --timeout=3s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:9000/healthz || exit 1
 
 WORKDIR /app
 

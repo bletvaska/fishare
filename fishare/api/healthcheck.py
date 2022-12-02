@@ -14,7 +14,7 @@ def is_db_session(session: Session):
 
 
 def check_storage_state(settings: Settings):
-    return settings.storage.exists() and settings.storage.is_dir() # and settings.storage.owner == 'mirek'
+    return settings.storage.exists() and settings.storage.is_dir() and settings.storage.owner == 'mirek'
 
 
 @router.get("/healthz")
