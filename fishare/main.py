@@ -12,18 +12,31 @@ from starlette_prometheus import PrometheusMiddleware, metrics
 from starlette.staticfiles import StaticFiles
 from starlette.middleware.base import BaseHTTPMiddleware
 
+from .api import healthcheck
 from .views import homepage
 from .dependencies import get_session, get_settings
 from .models.file_details import FileAdmin, FileDetails
 from .api.v1 import files, download, cron
 
+
 # create app and set routers
 app = FastAPI()
+
+
+
+@app.get('/deadlock')
+def deadlock():
+    while True:
+        time.sleep(1)
+        logger.info('working')
+
 app.add_route('/metrics', metrics)
+app.include_router(healthcheck.router)
 app.include_router(files.router, prefix=files.PATH_PREFIX)
 app.include_router(download.router)
 app.include_router(homepage.router)
 app.include_router(cron.router)
+
 
 # mount static folder
 app.mount(
