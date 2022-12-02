@@ -2,17 +2,15 @@ from datetime import datetime
 from pathlib import Path
 import time
 
-from fastapi import Depends, FastAPI, Request
+from fastapi import FastAPI, Request
+from fastapi_utils.tasks import repeat_every
 from loguru import logger
 from sqladmin import Admin
-from sqlmodel import SQLModel, Session, create_engine, or_, select
-from starlette_prometheus import PrometheusMiddleware, metrics
+from sqlmodel import SQLModel, create_engine, or_, select
 import uvicorn
+from starlette_prometheus import PrometheusMiddleware, metrics
 from starlette.staticfiles import StaticFiles
-from fastapi_utils.tasks import repeat_every
 from starlette.middleware.base import BaseHTTPMiddleware
-
-from fishare.models.settings import Settings
 
 from .views import homepage
 from .dependencies import get_session, get_settings
