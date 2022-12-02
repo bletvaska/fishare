@@ -11,8 +11,10 @@ router = fastapi.APIRouter()
 
 
 @router.get("/cron/")
-def cleanup(session: Session = fastapi.Depends(get_session),
-            settings: Settings = fastapi.Depends(get_settings)):
+def cleanup(
+    session: Session = fastapi.Depends(get_session),
+    settings: Settings = fastapi.Depends(get_settings),
+):
     start = datetime.now()
 
     statement = select(FileDetails).where(
@@ -38,8 +40,8 @@ def cleanup(session: Session = fastapi.Depends(get_session),
     duration = end - start
 
     return {
-            'startedAt': start,
-            'finishedAt': end,
-            'duration': duration.total_seconds(),
-            'removedFiles': len(files)
-            }
+        "startedAt": start,
+        "finishedAt": end,
+        "duration": duration.total_seconds(),
+        "removedFiles": len(files),
+    }
