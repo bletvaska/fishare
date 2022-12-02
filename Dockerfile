@@ -24,3 +24,4 @@ VOLUME /app/storage/
 USER appuser
 
 CMD [ "python", "-m", "fishare.main" ]
+# CMD "fishare"

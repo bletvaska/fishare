@@ -31,7 +31,7 @@ requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.scripts]
-fishare = "fishare.main:main"  # python - m fishare.main
+fishare = "fishare.main:main"  # python -m fishare.main
 
 [tool.pytest.ini_options]
 addopts = []
