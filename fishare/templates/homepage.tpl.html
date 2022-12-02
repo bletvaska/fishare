@@ -1,1 +1,21 @@
 <h1>Hello world!</h1>
+
+<p>
+  Volam sa {{ name }}.
+</p>
+
+{% if hobbies %}
+<p>
+  Medzi moje zaluby patri: {{ hobbies }}
+</p>
+
+<ul>
+  {% for item in hobbies %}
+  <li>{{ item | upper }}</li>
+  {% endfor %}
+</ul>
+{% else %}
+<p>
+  Nemam ziadne konicky, bo ma nic nebavi.
+</p>
+{% endif %}

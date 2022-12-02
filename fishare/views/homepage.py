@@ -9,6 +9,8 @@ templates = Jinja2Templates(directory="fishare/templates")
 @router.get("/")
 def homepage(request: fastapi.Request):
     data = {
-        'request': request
+        'request': request,
+        'name': 'mikulas',
+        'hobbies': ['kreslenie', 'pocitanie', 'programovanie v jazyku Python']
     }
     return templates.TemplateResponse('homepage.tpl.html', data)
