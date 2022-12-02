@@ -8,13 +8,14 @@ from starlette.staticfiles import StaticFiles
 from .views import homepage
 from .dependencies import get_settings
 from .models.file_details import FileAdmin
-from .api.v1 import files, download
+from .api.v1 import files, download, cron
 
 # create app and set routers
 app = FastAPI()
 app.include_router(files.router, prefix=files.PATH_PREFIX)
 app.include_router(download.router)
 app.include_router(homepage.router)
+app.include_router(cron.router)
 
 # mount static folder
 app.mount(

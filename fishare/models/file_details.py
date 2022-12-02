@@ -49,8 +49,7 @@ class FileDetails(SQLModel, table=True, validate=True):
 class FileAdmin(ModelView, model=FileDetails):
     column_list = [
         FileDetails.filename,
-        FileDetails.slug,
-        FileDetails.size,
         FileDetails.downloads,
         FileDetails.max_downloads,
+        FileDetails.expires
     ]
