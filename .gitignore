@@ -112,3 +112,5 @@ data/
 report.html
 .dockerignore
 .env
+*sqlite
+storage
