@@ -14,9 +14,10 @@ from fishare.models.settings import Settings
 router = fastapi.APIRouter()
 
 
-@router.head('/{slug}')
+@router.head("/{slug}")
 @router.get("/{slug}", status_code=200)
-def download_file(request: fastapi.Request,
+def download_file(
+    request: fastapi.Request,
     slug: str,
     session: Session = fastapi.Depends(get_session),
     settings: Settings = fastapi.Depends(get_settings),
@@ -34,7 +35,7 @@ def download_file(request: fastapi.Request,
         file = session.exec(statement).one()
 
         # update file downloads
-        if request.method == 'GET':
+        if request.method == "GET":
             file.downloads += 1
             session.commit()
             session.refresh(file)
@@ -43,9 +44,8 @@ def download_file(request: fastapi.Request,
         return FileResponse(
             settings.storage / file.slug,  # path
             filename=file.filename,  # filename
-            media_type=file.mime_type  # mime-type / content-type
+            media_type=file.mime_type,  # mime-type / content-type
         )
-
 
     except NoResultFound as ex:
         problem = ProblemDetails(
