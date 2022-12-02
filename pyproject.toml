@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "fishare"
-version = "0.1.0"
+version = "0.2.0"
 description = "Python 202 course project. Free implementation of fishare.io service."
 authors = ["Miroslav Biňas <miroslav.binas@tuke.sk>"]
 readme = "README.md"

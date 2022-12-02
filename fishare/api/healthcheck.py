@@ -1,4 +1,5 @@
 import fastapi
+from fastapi.responses import JSONResponse
 from sqlmodel import Session
 
 from fishare.dependencies import get_session, get_settings
@@ -13,7 +14,7 @@ def is_db_session(session: Session):
 
 
 def check_storage_state(settings: Settings):
-    return settings.storage.exists() and settings.storage.is_dir()
+    return settings.storage.exists() and settings.storage.is_dir() # and settings.storage.owner == 'mirek'
 
 
 @router.get("/healthz")
@@ -24,8 +25,11 @@ def healthcheck(
     db_state = is_db_session(session)
     fs_state = check_storage_state(settings)
 
-    return {
+
+    return JSONResponse(
+        status_code=200 if db_state and fs_state else 500,
+        content={
         "healthy": db_state and fs_state,
         "dbState": db_state,
         "fsState": fs_state
-        }
+        })
