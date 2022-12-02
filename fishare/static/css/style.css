@@ -1,0 +1,82 @@
+.hero {
+    /* Sizing */
+    width: 100vw;
+    height: 100vh;
+
+    /* Flexbox stuff */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    /* Text styles */
+    text-align: center;
+    color: white;
+
+    /* Background styles */
+    background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('/static/images/mountains.jpg');
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+}
+
+.hero h1 {
+    /* Text styles */
+    font-size: 5em;
+
+    /* Margins */
+    margin-top: 0;
+    /*margin-bottom: 0.5em;*/
+}
+
+.hero h2 {
+    font-size: 3em;
+}
+
+#toolbar {
+    position: absolute;
+    right: 5px;
+    top: 3px;
+    color: #aaa;
+}
+
+#infobar {
+    position: absolute;
+    right: 5px;
+    bottom: 3px;
+    color: #aaa;
+    font-size: 1em;
+}
+
+#toolbar a:link, #toolbar a:visited {
+    color: #aaa;
+}
+
+.message {
+    font-size: 1.5em;
+    color: #bbb;
+}
+
+.url > a {
+    font-size: 1.5em;
+    font-family: "monospace";
+    color: #bbb;
+    font-weight: bold;
+}
+
+h1 > a {
+    color: white;
+    text-decoration: none;
+}
+
+h1 > a:hover {
+    color: white;
+}
+
+#upload-form {
+    display: flex;
+}
+
+#info-box {
+    display: none;
+}
