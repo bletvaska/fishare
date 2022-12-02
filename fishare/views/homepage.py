@@ -13,4 +13,4 @@ def homepage(request: fastapi.Request):
         'name': 'mikulas',
         'hobbies': ['kreslenie', 'pocitanie', 'programovanie v jazyku Python']
     }
-    return templates.TemplateResponse('homepage.tpl.html', data)
+    return templates.TemplateResponse('home.tpl.html', data)
