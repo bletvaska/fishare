@@ -28,6 +28,11 @@ $ poetry completions bash > /etc/bash_completion.d/poetry.bash-completion
 ```
 
 
+### Aktualizácia cesty
+
+Pri inštalácii bude zrejme `pip` vypisovať informáciu o tom, že spustiteľné súbory nainštaloval do priečinku, ktorý nie je súčasťou cesty. Preto cestu aktualizujte o tento priečinok!
+
+
 ## Inicializacia projektu pomocou `poetry`
 
 v domovskom priecinku projektu inicializujeme projekt pomocou `poetry` prikazom
